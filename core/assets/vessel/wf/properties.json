@@ -1,0 +1,134 @@
+{
+  "name": "warfrigate",
+  "orientations": {
+    "0": {
+      "x": 0,
+      "y": 0,
+      "width": 28,
+      "height": 71,
+      "offsetx": 2,
+      "offsety": 16
+    },
+    "1": {
+      "x": 28,
+      "y": 0,
+      "width": 36,
+      "height": 70,
+      "offsetx": 2,
+      "offsety": 15
+    },
+    "2": {
+      "x": 64,
+      "y": 0,
+      "width": 55,
+      "height": 64,
+      "offsetx": 3,
+      "offsety": 17
+    },
+    "3": {
+      "x": 119,
+      "y": 0,
+      "width": 67,
+      "height": 56,
+      "offsetx": 7,
+      "offsety": 17
+    },
+    "4": {
+      "x": 186,
+      "y": 0,
+      "width": 70,
+      "height": 52,
+      "offsetx": 10,
+      "offsety": 20
+
+    },
+    "5": {
+      "x": 256,
+      "y": 0,
+      "width": 67,
+      "height": 55,
+      "offsetx": 8,
+      "offsety": 18
+    },
+    "6": {
+      "x": 323,
+      "y": 0,
+      "width": 55,
+      "height": 59,
+      "offsetx": 3,
+      "offsety": 17
+    },
+    "7": {
+      "x": 378,
+      "y": 0,
+      "width": 36,
+      "height": 67,
+      "offsetx": 3,
+      "offsety": 15
+    },
+    "8": {
+      "x": 414,
+      "y": 0,
+      "width": 28,
+      "height": 70,
+      "offsetx": 3,
+      "offsety": 12
+    },
+    "9": {
+      "x": 442,
+      "y": 0,
+      "width": 36,
+      "height": 67,
+      "offsetx": 0,
+      "offsety": 12
+    },
+    "10": {
+      "x": 478,
+      "y": 0,
+      "width": 55,
+      "height": 59,
+      "offsetx": -3,
+      "offsety": 16
+    },
+    "11": {
+      "x": 533,
+      "y": 0,
+      "width": 67,
+      "height": 55,
+      "offsetx": -5,
+      "offsety": 16
+    },
+    "12": {
+      "x": 600,
+      "y": 0,
+      "width": 70,
+      "height": 52,
+      "offsetx": -7,
+      "offsety": 18
+    },
+    "13": {
+      "x": 670,
+      "y": 0,
+      "width": 67,
+      "height": 58,
+      "offsetx": -8,
+      "offsety": 16
+    },
+    "14": {
+      "x": 737,
+      "y": 0,
+      "width": 55,
+      "height": 64,
+      "offsetx": -3,
+      "offsety": 18
+    },
+    "15": {
+      "x": 792,
+      "y": 0,
+      "width": 36,
+      "height": 70,
+      "offsetx": 3,
+      "offsety": 16
+    }
+  }
+}
