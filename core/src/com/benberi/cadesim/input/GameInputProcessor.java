@@ -1,4 +1,4 @@
-package com.benberi.cadesim.game.input;
+package com.benberi.cadesim.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;

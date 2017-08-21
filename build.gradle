@@ -48,7 +48,11 @@ project(":core") {
         compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         compile "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
-        
+        // https://mvnrepository.com/artifact/com.google.code.gson/gson
+        compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
+
+
+
     }
 }
 

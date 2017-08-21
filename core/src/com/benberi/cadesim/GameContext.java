@@ -1,7 +1,7 @@
 package com.benberi.cadesim;
 
 
-import com.benberi.cadesim.game.input.GameInputProcessor;
+import com.benberi.cadesim.input.GameInputProcessor;
 import com.benberi.cadesim.game.scene.GameScene;
 import com.benberi.cadesim.game.scene.impl.battle.SeaBattleScene;
 import com.benberi.cadesim.util.GameToolsContainer;
