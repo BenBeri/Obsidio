@@ -15,8 +15,6 @@ import com.benberi.cadesim.game.entity.vessel.move.MoveType;
 import com.benberi.cadesim.game.scene.GameScene;
 import com.benberi.cadesim.game.scene.impl.battle.tile.GameTile;
 
-import java.util.Random;
-
 public class SeaBattleScene implements GameScene {
 
     /**
@@ -90,7 +88,9 @@ public class SeaBattleScene implements GameScene {
     boolean m;
     boolean s;
 
-    float step;
+    private MoveType[] moves = new MoveType[] {MoveType.RIGHT, MoveType.LEFT, MoveType.FORWARD, MoveType.FORWARD, MoveType.LEFT, MoveType.LEFT, MoveType.LEFT, MoveType.LEFT};
+    private int moveIndex = 0;
+    private long ms = System.currentTimeMillis();
 
     private void renderEntities() {
 
@@ -110,16 +110,17 @@ public class SeaBattleScene implements GameScene {
 //
 
 
-        if (!m) {
-            Random r = new Random();
-            //ship.performMove(MoveType.values()[r.nextInt(MoveType.values().length - 1)]);
-            ship.performMove(MoveType.RIGHT);
+        if (System.currentTimeMillis() - ms >= 200 && !ship.isMoving() && moveIndex < moves.length) {
+            ship.performMove(moves[moveIndex]);
+            moveIndex++;
             ship.setMoving(true);
             m=true;
-            step = 0;
         }
 
         if (ship.isMoving()){
+
+            MoveType move = ship.getCurrentPerformingMove();
+
             // Normalized direction vector towards target
             Vector2 dir = ship.getEndPoint().cpy().sub(ship.getLinearVector()).nor();
 
@@ -128,23 +129,34 @@ public class SeaBattleScene implements GameScene {
 
             // calculate step based on progress towards target (0 -> 1)
            // float step = 1 - (ship.getEndPoint().dst(ship.getLinearVector()) / ship.getDistanceToEndPoint());
-            step += 0.1f;
-            if (ship.getCurrentPerformingMove() != MoveType.FORWARD) {
+            if (move != MoveType.FORWARD) {
+                ship.addStep(0.025f);
                 // step on curve (0 -> 1), first bezier point, second bezier point, third bezier point, temporary vector for calculations
-                Bezier.quadratic(ship.getCurrentAnimationLocation(), step, ship.getStartPoint().cpy(),
+                Bezier.quadratic(ship.getCurrentAnimationLocation(), (float) ship.getCurrentStep(), ship.getStartPoint().cpy(),
                         ship.getInbetweenPoint().cpy(), ship.getEndPoint().cpy(), new Vector2());
             }
             else {
-                Bezier.quadratic(ship.getCurrentAnimationLocation(), step, ship.getStartPoint().cpy(),
-                        new Vector2(ship.getStartPoint().x, ship.getEndPoint().y), ship.getEndPoint().cpy(), new Vector2());
+                int add = move.getIncrementXForRotation(ship.getRotationIndex());
+                if (add == -1 || add == 1) {
+                    ship.getCurrentAnimationLocation().x += (0.03f * (float) add);
+                }
+                else {
+                    add = move.getIncrementYForRotation(ship.getRotationIndex());
+                    ship.getCurrentAnimationLocation().y += (0.035f * (float) add);
+                }
+                ship.addStep(0.035f);
             }
 
+            int result = (int) (ship.getCurrentStep() * 100);
+            System.out.println(result);
+
             // check if the step is reached to the end, and dispose the movement
-            if (step == 1) {
+            if (result >= 100) {
                 ship.setX(ship.getEndPoint().x);
                 ship.setY(ship.getEndPoint().y);
                 ship.setMoving(false);
-                System.out.println("ENDED MOVE AT  "+ ship.getX() + " " + ship.getY());
+                ship.setRotationIndex(ship.getRotationTargetIndex());
+                ms = System.currentTimeMillis();
             }
             else {
                 // process move
@@ -153,7 +165,7 @@ public class SeaBattleScene implements GameScene {
             }
 
             // tick rotation of the ship image
-            if (System.currentTimeMillis() - ship.getLastAnimationUpdate() >= Vessel.ROTATION_TICK_DELAY) {
+            if (result % 25 == 0) {
                 ship.tickRotation();
             }
         }

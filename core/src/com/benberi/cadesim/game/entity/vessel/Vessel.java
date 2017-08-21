@@ -78,7 +78,15 @@ public abstract class Vessel extends Entity {
      */
     private long lastAnimationUpdate;
 
+    /**
+     * Current performing move
+     */
     private MoveType currentPerformingMove;
+
+    /**
+     * The current step on curve
+     */
+    private double currentStep;
 
     public Vessel(GameContext context) {
         super(context);
@@ -92,6 +100,8 @@ public abstract class Vessel extends Entity {
         start = new Vector2(this.getX(), this.getY());
         currentAnimationLocation = start.cpy();
         this.currentPerformingMove = move;
+
+        currentStep = 0;
 
         if (move == MoveType.FORWARD) {
             inbetween = null;
@@ -121,6 +131,14 @@ public abstract class Vessel extends Entity {
 
     public Vector2 getCurrentAnimationLocation() {
         return this.currentAnimationLocation;
+    }
+
+    public double getCurrentStep() {
+        return this.currentStep;
+    }
+
+    public void addStep(double step) {
+        this.currentStep += step;
     }
 
     /**
@@ -210,12 +228,8 @@ public abstract class Vessel extends Entity {
         return this.linear;
     }
 
-    /**
-     * Gets the distance set from starting point to ending point on animation initialization
-     * @return {@link #distanceToEnd} set at {@link #performMove(MoveType)}
-     */
-    public float getDistanceToEndPoint() {
-        return this.distanceToEnd;
+    public int getRotationIndex() {
+        return this.rotationIndex;
     }
 
     /**
@@ -226,10 +240,20 @@ public abstract class Vessel extends Entity {
         if (rotationIndex == rotationTargetIndex) {
             return;
         }
-        this.rotationIndex++;
+        if (currentPerformingMove == MoveType.LEFT) {
+            this.rotationIndex--;
+        }
+        else {
+            this.rotationIndex++;
+        }
+
         if (rotationIndex > 15) {
             rotationIndex = 0;
         }
+        else if (rotationIndex < 0) {
+            rotationIndex = 14;
+        }
+
         this.updateRotation();
         this.lastAnimationUpdate = System.currentTimeMillis();
     }
@@ -249,7 +273,12 @@ public abstract class Vessel extends Entity {
     private void updateRotation() {
         this.setOrientationLocation(this.rotationIndex);
         OrientationLocation location = this.getOrientationLocation();
-        this.setRegion(location.getX(), location.getY(), location.getWidth(), location.getHeight());
+        try {
+            this.setRegion(location.getX(), location.getY(), location.getWidth(), location.getHeight());
+        }
+        catch(NullPointerException e) {
+            System.err.println(rotationIndex + " " + rotationTargetIndex);
+        }
     }
 
     /**

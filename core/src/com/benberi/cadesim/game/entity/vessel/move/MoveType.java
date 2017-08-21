@@ -84,14 +84,14 @@ public enum MoveType {
         switch (this) {
             case LEFT:
                 rot = rotationIndex - 4;
-                if (rot > 15) {
-                    rot = 2;
+                if (rot < 0) {
+                    rot = 14;
                 }
                 break;
             case RIGHT:
                 rot = rotationIndex + 4;
-                if (rot < 0) {
-                    rot = 14;
+                if (rot > 15) {
+                    rot = 2;
                 }
                 break;
         }

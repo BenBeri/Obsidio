@@ -18,7 +18,7 @@ public class WarFrigate extends Vessel {
         this.setOrientationPack(getContext().getTools().getGson().fromJson(
                 SimpleFileUtils.readStringFromFile("core/assets/vessel/wf/properties.json"),
                 PackedShipOrientation.class));
-        this.setRotationIndex(2);
+        this.setRotationIndex(14);
     }
 
     @Override
