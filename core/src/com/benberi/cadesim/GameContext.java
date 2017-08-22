@@ -4,7 +4,7 @@ package com.benberi.cadesim;
 import com.benberi.cadesim.game.entity.EntityManager;
 import com.benberi.cadesim.game.entity.projectile.ProjectileManager;
 import com.benberi.cadesim.game.scene.GameScene;
-import com.benberi.cadesim.game.scene.impl.login.LoginScene;
+import com.benberi.cadesim.game.scene.impl.battle.SeaBattleScene;
 import com.benberi.cadesim.input.GameInputProcessor;
 import com.benberi.cadesim.util.GameToolsContainer;
 
@@ -51,7 +51,7 @@ public class GameContext {
     public void create() {
         this.input = new GameInputProcessor(this);
         this.projectileManager = new ProjectileManager();
-        this.currentScene = new LoginScene(this);
+        this.currentScene = new SeaBattleScene(this);
         currentScene.create();
     }
 

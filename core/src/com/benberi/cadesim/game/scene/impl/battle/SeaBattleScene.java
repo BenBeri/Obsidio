@@ -48,9 +48,13 @@ public class SeaBattleScene implements GameScene {
 
     private Vessel ship;
 
+    private Texture sea;
+
     @Override
     public void create() {
         this.batch = new SpriteBatch();
+        sea = new Texture("core/assets/sea/sea1.png");
+        sea.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         map = new SeaMap();
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         this.ship = new WarFrigate(context);
@@ -142,6 +146,8 @@ public class SeaBattleScene implements GameScene {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
+        drawSea();
+
         // Render the map
         renderSeaBattle();
 
@@ -149,6 +155,13 @@ public class SeaBattleScene implements GameScene {
         renderEntities();
 
         batch.end();
+    }
+
+    /**
+     * Draws the sea background
+     */
+    private void drawSea() {
+        batch.draw(sea, -5000, -5000, 0, 0, 10000, 10000);
     }
 
     /**
