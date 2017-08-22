@@ -1,9 +1,11 @@
 package com.benberi.cadesim;
 
 
-import com.benberi.cadesim.input.GameInputProcessor;
+import com.benberi.cadesim.game.entity.EntityManager;
+import com.benberi.cadesim.game.entity.projectile.ProjectileManager;
 import com.benberi.cadesim.game.scene.GameScene;
-import com.benberi.cadesim.game.scene.impl.battle.SeaBattleScene;
+import com.benberi.cadesim.game.scene.impl.login.LoginScene;
+import com.benberi.cadesim.input.GameInputProcessor;
 import com.benberi.cadesim.util.GameToolsContainer;
 
 public class GameContext {
@@ -24,6 +26,16 @@ public class GameContext {
     private GameScene currentScene;
 
     /**
+     * The projectile manager
+     */
+    private ProjectileManager projectileManager;
+
+    /**
+     * The entity manager
+     */
+    private EntityManager entities = new EntityManager();
+
+    /**
      * Public GSON object
      */
     private GameToolsContainer tools;
@@ -38,11 +50,17 @@ public class GameContext {
      */
     public void create() {
         this.input = new GameInputProcessor(this);
+        this.projectileManager = new ProjectileManager();
+        this.currentScene = new LoginScene(this);
+        currentScene.create();
+    }
 
-        SeaBattleScene sea = new SeaBattleScene(this);
-        sea.create();
+    public ProjectileManager getProjectileManager() {
+        return this.projectileManager;
+    }
 
-        this.currentScene = sea;
+    public EntityManager getEntities() {
+        return this.entities;
     }
 
     /**

@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.game.entity.Entity;
 import com.benberi.cadesim.game.entity.vessel.move.MoveType;
+import com.benberi.cadesim.game.entity.vessel.move.VesselMoveTurn;
 import com.benberi.cadesim.util.OrientationLocation;
 
 /**
@@ -34,36 +35,6 @@ public abstract class Vessel extends Entity {
     private boolean isMoving;
 
     /**
-     * Animation start position
-     */
-    private Vector2 start;
-
-    /**
-     * Animation inbetween position (only for left/right movements)
-     */
-    private Vector2 inbetween;
-
-    /**
-     * Animation ending position
-     */
-    private Vector2 end;
-
-    /**
-     * Linear vector for bezier curve
-     */
-    private Vector2 linear;
-
-    /**
-     * The current animation location
-     */
-    private Vector2 currentAnimationLocation;
-
-    /**
-     * The distance to target positon
-     */
-    private float distanceToEnd;
-
-    /**
      * The rotation index of the vessel
      */
     private int rotationIndex;
@@ -74,9 +45,9 @@ public abstract class Vessel extends Entity {
     private int rotationTargetIndex = -1;
 
     /**
-     * Last animation update time in milliseconds
+     * The animation handler
      */
-    private long lastAnimationUpdate;
+    private VesselAnimationVector animation;
 
     /**
      * Current performing move
@@ -84,12 +55,18 @@ public abstract class Vessel extends Entity {
     private MoveType currentPerformingMove;
 
     /**
-     * The current step on curve
+     * The current turn
      */
-    private double currentStep;
+    private VesselMoveTurn turn;
+
+    /**
+     * If the vessel is performing shoot
+     */
+    private boolean isPerformingShoot;
 
     public Vessel(GameContext context) {
         super(context);
+        turn = new VesselMoveTurn();
     }
 
     /**
@@ -97,48 +74,44 @@ public abstract class Vessel extends Entity {
      * @param move The move to perform
      */
     public void performMove(MoveType move) {
-        start = new Vector2(this.getX(), this.getY());
-        currentAnimationLocation = start.cpy();
+        Vector2 start = new Vector2(this.getX(), this.getY());
+        Vector2 currentAnimationLocation = start.cpy();
         this.currentPerformingMove = move;
 
-        currentStep = 0;
-
-        if (move == MoveType.FORWARD) {
-            inbetween = null;
-        }
-        else {
+        Vector2 inbetween = null;
+        if (move != MoveType.FORWARD) {
             // Get the inbetween block by using forward
-            this.inbetween = new Vector2(start.x + MoveType.FORWARD.getIncrementXForRotation(rotationIndex),
+            inbetween = new Vector2(start.x + MoveType.FORWARD.getIncrementXForRotation(rotationIndex),
                     start.y + MoveType.FORWARD.getIncrementYForRotation(rotationIndex));
-            System.out.println("currrent: " + getX() + " " + getY());
-            System.out.println("rotation: " + rotationIndex + " inbetween: " + inbetween.x + " " + inbetween.y);
             this.rotationTargetIndex = move.getRotationTargetIndex(rotationIndex);
-            System.out.println("Target set: " + rotationTargetIndex + " from " + rotationIndex);
         }
 
-        this.end = new Vector2(start.x + move.getIncrementXForRotation(rotationIndex),
+        Vector2 end = new Vector2(start.x + move.getIncrementXForRotation(rotationIndex),
                 start.y + move.getIncrementYForRotation(rotationIndex));
 
-        System.out.println("END POSITION: " + end.x  + " " + end.y);
-        this.linear = start.cpy();
-        this.distanceToEnd = start.dst(end);
-        this.lastAnimationUpdate = 0;
+        Vector2 linear = start.cpy();
+        this.animation = new VesselAnimationVector(start, inbetween, end, currentAnimationLocation, linear);
+        setMoving(true);
     }
 
+    public VesselMoveTurn getTurn() {
+        return this.turn;
+    }
+
+    /**
+     * Gets the animation handler for vessel
+     * @return {@link #animation}
+     */
+    public VesselAnimationVector getAnimation() {
+        return this.animation;
+    }
+
+    /**
+     * Gets the current performing move
+     * @return {@link #currentPerformingMove}
+     */
     public MoveType getCurrentPerformingMove() {
         return this.currentPerformingMove;
-    }
-
-    public Vector2 getCurrentAnimationLocation() {
-        return this.currentAnimationLocation;
-    }
-
-    public double getCurrentStep() {
-        return this.currentStep;
-    }
-
-    public void addStep(double step) {
-        this.currentStep += step;
     }
 
     /**
@@ -173,19 +146,19 @@ public abstract class Vessel extends Entity {
     }
 
     /**
-     * Gets the last animation time
-     * @return {@link #lastAnimationUpdate}
-     */
-    public long getLastAnimationUpdate() {
-        return this.lastAnimationUpdate;
-    }
-
-    /**
      * If the ship currently performing move animation or not
      * @param flag If moving or not
      */
     public void setMoving(boolean flag) {
         this.isMoving = flag;
+    }
+
+    public boolean isPerformingShoot() {
+        return this.isPerformingShoot;
+    }
+
+    public void setPerformingShoot(boolean flag) {
+        this.isPerformingShoot = flag;
     }
 
     /**
@@ -197,37 +170,9 @@ public abstract class Vessel extends Entity {
     }
 
     /**
-     * Gets the starting point of the move
-     * @return {@link #start}
+     * Gets the current rotation index
+     * @return {{@link #rotationIndex}}
      */
-    public Vector2 getStartPoint() {
-        return this.start;
-    }
-
-    /**
-     * Gets the ending target point of the move
-     * @return {@link #end}
-     */
-    public Vector2 getEndPoint() {
-        return this.end;
-    }
-
-    /**
-     * Gets the in-between point of the move
-     * @return {@link #inbetween}
-     */
-    public Vector2 getInbetweenPoint() {
-        return this.inbetween;
-    }
-
-    /**
-     * Gets the linear vector using to calculate position move in the curve
-     * @return {@link #linear}
-     */
-    public Vector2 getLinearVector() {
-        return this.linear;
-    }
-
     public int getRotationIndex() {
         return this.rotationIndex;
     }
@@ -236,14 +181,13 @@ public abstract class Vessel extends Entity {
      * Ticks up to next rotation
      */
     public void tickRotation() {
-        System.out.println(rotationIndex + " " + rotationTargetIndex);
         if (rotationIndex == rotationTargetIndex) {
             return;
         }
         if (currentPerformingMove == MoveType.LEFT) {
             this.rotationIndex--;
         }
-        else {
+        else if (currentPerformingMove == MoveType.RIGHT) {
             this.rotationIndex++;
         }
 
@@ -255,7 +199,6 @@ public abstract class Vessel extends Entity {
         }
 
         this.updateRotation();
-        this.lastAnimationUpdate = System.currentTimeMillis();
     }
 
     /**
@@ -295,4 +238,9 @@ public abstract class Vessel extends Entity {
      * Maximum amount of cannons
      */
     public abstract int getMaxCannons();
+
+    public void performShoot() {
+
+        //getContext().getProjectileManager().fireProjectile(this, );
+    }
 }

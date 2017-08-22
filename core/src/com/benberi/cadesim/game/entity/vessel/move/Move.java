@@ -1,7 +1,5 @@
 package com.benberi.cadesim.game.entity.vessel.move;
 
-import com.benberi.cadesim.game.entity.projectile.CannonBall;
-
 public class Move {
 
     /**
@@ -12,32 +10,36 @@ public class Move {
     /**
      * Left cannon ball shoots
      */
-    private CannonBall[] left = new CannonBall[2];
+    private boolean[] left = new boolean[2];
 
     /**
      * Right cannon ball shots
      */
-    private CannonBall[] right = new CannonBall[2];
+    private boolean[] right = new boolean[2];
+
+    public Move() {
+        this.type = MoveType.NONE;
+    }
 
     public void setMoveType(MoveType type) {
         this.type = type;
     }
 
     public void addLeftCannon() {
-        if (left[0] == null) {
-            left[0] = new CannonBall(); // todo pass cannon factory based on ship size
+        if (!left[0]) {
+            left[0] = true;
         }
         else {
-            left[1] = new CannonBall();
+            left[1] = true;
         }
     }
 
-    public void addRightCannon() {
-        if (right[0] == null) {
-             right[0] = new CannonBall(); // todo pass cannon factory based on ship size
+    public void addRightannon() {
+        if (!right[0]) {
+            right[0] = true;
         }
         else {
-            right[1] = new CannonBall();
+            right[1] = true;
         }
     }
 
@@ -45,11 +47,15 @@ public class Move {
         return type;
     }
 
-    public CannonBall[] getLeft() {
+    public boolean hasShoots() {
+        return left[0] || right[0];
+    }
+
+    public boolean[] getLeft() {
         return left;
     }
 
-    public CannonBall[] getRight() {
+    public boolean[] getRight() {
         return right;
     }
 }
