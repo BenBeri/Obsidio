@@ -5,8 +5,12 @@ import com.benberi.cadesim.game.entity.EntityManager;
 import com.benberi.cadesim.game.entity.projectile.ProjectileManager;
 import com.benberi.cadesim.game.scene.GameScene;
 import com.benberi.cadesim.game.scene.impl.battle.SeaBattleScene;
+import com.benberi.cadesim.game.scene.impl.control.ControlAreaScene;
 import com.benberi.cadesim.input.GameInputProcessor;
 import com.benberi.cadesim.util.GameToolsContainer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameContext {
 
@@ -21,9 +25,14 @@ public class GameContext {
     private GameInputProcessor input;
 
     /**
-     * The current active scene
+     * The sea battle scene
      */
-    private GameScene currentScene;
+    private SeaBattleScene seaBattleScene;
+
+    /**
+     * The control area scene
+     */
+    private ControlAreaScene controlArea;
 
     /**
      * The projectile manager
@@ -34,6 +43,11 @@ public class GameContext {
      * The entity manager
      */
     private EntityManager entities = new EntityManager();
+
+    /**
+     * List of scenes
+     */
+    private List<GameScene> scenes = new ArrayList<GameScene>();
 
     /**
      * Public GSON object
@@ -51,8 +65,18 @@ public class GameContext {
     public void create() {
         this.input = new GameInputProcessor(this);
         this.projectileManager = new ProjectileManager();
-        this.currentScene = new SeaBattleScene(this);
-        currentScene.create();
+        this.seaBattleScene = new SeaBattleScene(this);
+        seaBattleScene.create();
+        this.controlArea = new ControlAreaScene(this);
+        controlArea.create();
+
+        scenes.add(controlArea);
+        scenes.add(seaBattleScene);
+
+    }
+
+    public List<GameScene> getScenes() {
+        return this.scenes;
     }
 
     public ProjectileManager getProjectileManager() {
@@ -61,24 +85,6 @@ public class GameContext {
 
     public EntityManager getEntities() {
         return this.entities;
-    }
-
-    /**
-     * Gets the current active game scene
-     *
-     * @return The active game scene {@link #currentScene}
-     */
-    public GameScene getCurrentActiveScene() {
-        return this.currentScene;
-    }
-
-    /**
-     * Sets active current scene {@link #currentScene}
-     *
-     * @param scene The new scene to be active
-     */
-    public void setCurrentActiveScene(GameScene scene) {
-        this.currentScene = scene;
     }
 
     /**

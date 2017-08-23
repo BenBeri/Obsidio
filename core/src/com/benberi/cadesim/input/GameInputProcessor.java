@@ -3,6 +3,7 @@ package com.benberi.cadesim.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.benberi.cadesim.GameContext;
+import com.benberi.cadesim.game.scene.GameScene;
 
 public class GameInputProcessor implements InputProcessor {
 
@@ -30,7 +31,8 @@ public class GameInputProcessor implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        context.getCurrentActiveScene().handleClick(screenX, screenY);
+        for (GameScene scene : context.getScenes())
+            scene.handleClick(screenX, screenY);
         return false;
     }
 
@@ -43,7 +45,8 @@ public class GameInputProcessor implements InputProcessor {
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         float x = Gdx.input.getDeltaX();
         float y = Gdx.input.getDeltaY();
-        context.getCurrentActiveScene().handleDrag(x, y);
+        for (GameScene scene : context.getScenes())
+            scene.handleDrag(x, y);
         return false;
     }
 
