@@ -115,7 +115,6 @@ public class SeaBattleScene implements GameScene {
             }
 
             int result = (int) (ship.getAnimation().getCurrentStep() * 100);
-            System.out.println(result);
 
             // check if the step is reached to the end, and dispose the movement
             if (result >= 100) {

@@ -1,7 +1,9 @@
 package com.benberi.cadesim.game.scene.impl.control;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.game.scene.SceneComponent;
 
@@ -27,7 +29,12 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
      */
     private int shoots;
 
+    private HandMove[] movesHolder;
+
     private Texture shiphand;
+
+    private Texture moves;
+    private Texture emptyMoves;
 
     private TextureRegion leftMoveTexture;
     private TextureRegion rightMoveTexture;
@@ -44,18 +51,55 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
 
     private Texture hourGlass;
 
-    private TextureRegion cannon;
-    private TextureRegion emptyCannon;
+    private Texture cannonSlots;
+    private TextureRegion cannonLeft;
+    private TextureRegion cannonRight;
+    private TextureRegion emptyCannonLeft;
+    private TextureRegion emptyCannonRight;
 
+    private Texture controlBackground;
+
+    private SpriteBatch batch;
+    private ShapeRenderer shape;
 
     protected BattleControlComponent(GameContext context, ControlAreaScene owner) {
         super(context, owner);
+     //   for (int i = 0; i < movesHolder.length; i++) {
+//            if (big) {
+//                movesHolder[i] = new BigShipHandMove();
+//            }
+//            else {
+//                movesHolder[i] = new SmallShipHandMove();
+//            }
+      //  }
     }
 
     @Override
     public void create() {
+        batch = new SpriteBatch();
+        shape = new ShapeRenderer();
+
+        cannonSlots = new Texture("core/assets/ui/cannonslots.png");
+        moves = new Texture("core/assets/ui/move.png");
+        emptyMoves = new Texture("core/assets/ui/move_empty.png");
         shiphand = new Texture("core/assets/ui/shiphand.png");
         hourGlass = new Texture("core/assets/ui/hourglass.png");
+        controlBackground = new Texture("core/assets/ui/moves-background.png");
+
+        leftMoveTexture = new TextureRegion(moves, 0, 0, 28, 28);
+        forwardMoveTexture = new TextureRegion(moves, 28, 0, 28, 28);
+        rightMoveTexture = new TextureRegion(moves, 56, 0, 28, 28);
+        manuaverTexture = new TextureRegion(moves, 84, 0, 28, 28);
+
+        emptyLeftMoveTexture = new TextureRegion(emptyMoves, 0, 0, 28, 28);
+        emptyForwardMoveTexture = new TextureRegion(emptyMoves, 28, 0, 28, 28);
+        emptyRightMoveTexture = new TextureRegion(emptyMoves, 56, 0, 28, 28);
+
+        emptyCannonLeft = new TextureRegion(cannonSlots, 0, 0, 16, 18);
+        emptyCannonRight = new TextureRegion(cannonSlots, 16, 0, 16, 18);
+
+        cannonLeft = new TextureRegion(cannonSlots, 32, 0, 16, 18);
+        cannonRight = new TextureRegion(cannonSlots, 48, 0, 16, 18);
     }
 
     @Override
@@ -65,7 +109,7 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
 
     @Override
     public void render() {
-
+        renderMoveControl();
     }
 
     public void updateLeftMoves(boolean inc) {
@@ -105,5 +149,32 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
                 this.shoots = 0;
             }
         }
+    }
+
+    private void renderMoveControl() {
+        batch.begin();
+
+        // The yellow BG
+        batch.draw(controlBackground, 5, 8, controlBackground.getWidth(), controlBackground.getHeight() + 5);
+
+        // The hand bg
+        batch.draw(shiphand, controlBackground.getWidth() - shiphand.getWidth() - 80, 19);
+
+        int height = controlBackground.getHeight() - 40;
+
+//        for (int i = 0; i < movesHolder.length; i++) {
+//            // SmallShipHandMove m = movesHolder[i];
+//
+//            batch.draw(emptyCannonLeft, controlBackground.getWidth() - shiphand.getWidth() - 80, height);
+//            batch.draw(emptyCannonRight, controlBackground.getWidth() - shiphand.getWidth() - 35, height);
+//        }
+
+        // The timer
+        batch.draw(hourGlass, controlBackground.getWidth() - hourGlass.getWidth() - 22, 22);
+
+        batch.draw(emptyLeftMoveTexture, 70, controlBackground.getHeight() - 85);
+        batch.draw(emptyForwardMoveTexture, 102, controlBackground.getHeight() - 85);
+        batch.draw(emptyRightMoveTexture, 134, controlBackground.getHeight() - 85);
+        batch.end();
     }
 }
