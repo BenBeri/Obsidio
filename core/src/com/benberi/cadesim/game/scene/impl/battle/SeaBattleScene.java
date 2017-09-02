@@ -48,7 +48,15 @@ public class SeaBattleScene implements GameScene {
 
     private Vessel ship;
 
+    /**
+     * The sea texture
+     */
     private Texture sea;
+
+    /**
+     * If the user can drag the map
+     */
+    private boolean canDragMap;
 
     @Override
     public void create() {
@@ -142,6 +150,7 @@ public class SeaBattleScene implements GameScene {
 
     @Override
     public void render() {
+
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
@@ -200,12 +209,35 @@ public class SeaBattleScene implements GameScene {
     }
 
     @Override
-    public void handleDrag(float x, float y) {
-        camera.translate(-x, y);
+    public boolean handleDrag(float sx, float sy, float x, float y) {
+        if (sy > camera.viewportHeight) {
+            return false;
+        }
+
+        if (this.canDragMap) {
+            camera.translate(-x, y);
+        }
+
+        return true;
     }
 
     @Override
-    public void handleClick(float x, float y) {
+    public boolean handleClick(float x, float y) {
+        if (y < camera.viewportHeight) {
+            this.canDragMap = true;
+            return true;
+        }
+        this.canDragMap = false;
+        return false;
+    }
+
+    @Override
+    public boolean handleClickRelease(float x, float y) {
+        if (y < camera.viewportHeight) {
+            return true;
+        }
+        this.canDragMap = false;
+        return false;
     }
 
 

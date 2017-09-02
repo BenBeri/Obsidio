@@ -21,7 +21,7 @@ public class ControlAreaScene implements GameScene {
     public void create()
     {
         shapeRenderer = new ShapeRenderer();
-        this.control = new BattleControlComponent(context, this);
+        this.control = new BattleControlComponent(context, this, true);
         control.create();
     }
 
@@ -43,13 +43,21 @@ public class ControlAreaScene implements GameScene {
     }
 
     @Override
-    public void handleDrag(float x, float y) {
-
+    public boolean handleDrag(float sx, float sy, float x, float y) {
+        return true;
     }
 
     @Override
-    public void handleClick(float x, float y) {
+    public boolean handleClick(float x, float y) {
+        if (control.handleClick(x, y)) {
+            return true;
+        }
+        return false;
+    }
 
+    @Override
+    public boolean handleClickRelease(float x, float y) {
+        return false;
     }
 
     private void renderBackground() {

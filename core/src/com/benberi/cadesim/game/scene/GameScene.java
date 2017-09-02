@@ -27,16 +27,23 @@ public interface GameScene {
 
     /**
      * Handles mouse drag input
-     * @param x drag-x
-     * @param y drag-y
+     * @param diffX drag-x
+     * @param diffY drag-y
      */
-    void handleDrag(float x, float y);
+    boolean handleDrag(float screenX, float screenY, float diffX, float diffY);
 
     /**
      * Handles click on screen
      * @param x click-x
      * @param y click-y
      */
-    void handleClick(float x, float y);
+    boolean handleClick(float x, float y);
+
+    /**
+     * Handles click release on screen
+     * @param x click-x
+     * @param y click-y
+     */
+    boolean handleClickRelease(float x, float y);
 
 }

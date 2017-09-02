@@ -31,13 +31,22 @@ public class GameInputProcessor implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        for (GameScene scene : context.getScenes())
-            scene.handleClick(screenX, screenY);
+        for (GameScene scene : context.getScenes()) {
+            if (scene.handleClick(screenX, screenY)) {
+                break;
+            }
+        }
+
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        for (GameScene scene : context.getScenes()) {
+            if (scene.handleClickRelease(screenX, screenY)) {
+                break;
+            }
+        }
         return false;
     }
 
@@ -45,8 +54,12 @@ public class GameInputProcessor implements InputProcessor {
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         float x = Gdx.input.getDeltaX();
         float y = Gdx.input.getDeltaY();
-        for (GameScene scene : context.getScenes())
-            scene.handleDrag(x, y);
+        for (GameScene scene : context.getScenes()) {
+            if (scene.handleDrag(screenX, screenY, x, y)) {
+                break;
+            }
+        }
+
         return false;
     }
 

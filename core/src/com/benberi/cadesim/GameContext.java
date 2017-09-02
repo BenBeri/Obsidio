@@ -1,6 +1,8 @@
 package com.benberi.cadesim;
 
 
+import com.benberi.cadesim.client.codec.util.Packet;
+import com.benberi.cadesim.client.packet.ClientPacketHandler;
 import com.benberi.cadesim.game.entity.EntityManager;
 import com.benberi.cadesim.game.entity.projectile.ProjectileManager;
 import com.benberi.cadesim.game.scene.GameScene;
@@ -54,9 +56,15 @@ public class GameContext {
      */
     private GameToolsContainer tools;
 
+    private ClientPacketHandler packets;
+
     public GameContext(BlockadeSimulator main) {
         this.simulator = main;
         this.tools = new GameToolsContainer();
+
+
+        // init client
+        this.packets = new ClientPacketHandler(this);
     }
 
     /**
@@ -93,5 +101,20 @@ public class GameContext {
      */
     public GameToolsContainer getTools() {
         return this.tools;
+    }
+
+    /**
+     * Handles the incoming packet from the server
+     * @param o The incoming packet
+     */
+    public void handlePacket(Packet o) {
+    }
+
+    /**
+     * Gets the packet handler
+     * @return {@link #packets}
+     */
+    public ClientPacketHandler getPacketHandler() {
+        return packets;
     }
 }
