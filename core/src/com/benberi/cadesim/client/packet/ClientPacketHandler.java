@@ -3,6 +3,7 @@ package com.benberi.cadesim.client.packet;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.client.codec.util.Packet;
 import com.benberi.cadesim.client.packet.in.AddPlayerShip;
+import com.benberi.cadesim.client.packet.in.SendMapPacket;
 import com.benberi.cadesim.client.packet.in.SetTimePacket;
 
 import java.util.HashMap;
@@ -57,5 +58,6 @@ public class ClientPacketHandler {
     private void registerPackets() {
         packets.put(0, new SetTimePacket(context));
         packets.put(2, new AddPlayerShip(context));
+        packets.put(3, new SendMapPacket(context));
     }
 }

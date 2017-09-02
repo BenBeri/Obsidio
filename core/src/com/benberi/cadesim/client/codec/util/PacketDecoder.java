@@ -107,7 +107,7 @@ public class PacketDecoder extends StatefulByteDecoder<PacketDecodeState> {
                     this.length = buffer.readUnsignedByte();
                     break;
                 case SHORT:
-                    this.length = buffer.readUnsignedByte();
+                    this.length = buffer.readUnsignedShort();
                     break;
                 case MEDIUM:
                     this.length = buffer.readUnsignedMedium();
