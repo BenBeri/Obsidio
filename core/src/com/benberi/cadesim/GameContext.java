@@ -6,6 +6,7 @@ import com.benberi.cadesim.client.packet.ClientPacketHandler;
 import com.benberi.cadesim.game.entity.EntityManager;
 import com.benberi.cadesim.game.entity.projectile.ProjectileManager;
 import com.benberi.cadesim.game.scene.GameScene;
+import com.benberi.cadesim.game.scene.impl.battle.GameInformation;
 import com.benberi.cadesim.game.scene.impl.battle.SeaBattleScene;
 import com.benberi.cadesim.game.scene.impl.control.ControlAreaScene;
 import com.benberi.cadesim.input.GameInputProcessor;
@@ -44,7 +45,7 @@ public class GameContext {
     /**
      * The entity manager
      */
-    private EntityManager entities = new EntityManager();
+    private EntityManager entities;
 
     /**
      * List of scenes
@@ -62,7 +63,7 @@ public class GameContext {
         this.simulator = main;
         this.tools = new GameToolsContainer();
 
-
+        entities = new EntityManager(this);
         // init client
         this.packets = new ClientPacketHandler(this);
     }
@@ -116,5 +117,13 @@ public class GameContext {
      */
     public ClientPacketHandler getPacketHandler() {
         return packets;
+    }
+
+    public SeaBattleScene getBattleScene() {
+        return (SeaBattleScene) scenes.get(1);
+    }
+
+    public ControlAreaScene getControlScene() {
+        return (ControlAreaScene) scenes.get(0);
     }
 }

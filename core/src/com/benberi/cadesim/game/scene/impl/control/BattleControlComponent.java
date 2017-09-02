@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.benberi.cadesim.Constants;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.game.entity.vessel.move.MoveType;
 import com.benberi.cadesim.game.scene.SceneComponent;
@@ -78,6 +79,11 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
     private boolean auto;
 
     /**
+     * The turn time
+     */
+    private int time = 0;
+
+    /**
      * Textures
      */
     private Texture shiphand;
@@ -90,9 +96,14 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
     private TextureRegion emptyLeftMoveTexture;
     private TextureRegion emptyRightMoveTexture;
     private TextureRegion emptyForwardMoveTexture;
+    private Texture sandTopTexture;
+    private Texture sandBottomTexture;
     private TextureRegion sandBottom;
     private TextureRegion sandTop;
-    private Texture sandTrickle;
+
+    private Texture sandTrickleTexture;
+    private TextureRegion sandTrickle;
+
     private Texture hourGlass;
     private Texture cannonSlots;
     private TextureRegion cannonLeft;
@@ -139,6 +150,15 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
         autoOn = new Texture("core/assets/ui/auto-on.png");
         autoOff = new Texture("core/assets/ui/auto-off.png");
 
+        sandTopTexture = new Texture("core/assets/ui/sand_top.png");
+        sandBottomTexture = new Texture("core/assets/ui/sand_bot.png");
+
+        sandTrickleTexture = new Texture("core/assets/ui/sand_trickle.png");
+        sandTrickle = new TextureRegion(sandTrickleTexture, 0, 0, 1, sandTopTexture.getHeight());
+
+        sandTop = new TextureRegion(sandTopTexture, sandTopTexture.getWidth(), sandTopTexture.getHeight());
+        sandBottom= new TextureRegion(sandBottomTexture, sandBottomTexture.getWidth(), sandBottomTexture.getHeight());
+
         cannonSlots = new Texture("core/assets/ui/cannonslots.png");
         moves = new Texture("core/assets/ui/move.png");
         emptyMoves = new Texture("core/assets/ui/move_empty.png");
@@ -180,9 +200,20 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
 
     }
 
+
+
     @Override
     public void update() {
-       // System.out.println(Gdx.input.getX() + " " + Gdx.input.getY());
+
+        double ratio = (double) sandTopTexture.getHeight() / (double) Constants.TURN_TIME;
+
+        sandTop.setRegionY(sandTopTexture.getHeight() - (int) Math.round(time * ratio));
+        sandTop.setRegionHeight((int) Math.round(time * ratio));
+
+        ratio =  (double) sandBottomTexture.getHeight() / (double) Constants.TURN_TIME;
+
+        sandBottom.setRegionY(sandBottomTexture.getHeight() - (int) Math.round((Constants.TURN_TIME - time) * ratio));
+        sandBottom.setRegionHeight((int) Math.round((Constants.TURN_TIME - time) * ratio));
     }
 
     @Override
@@ -202,6 +233,22 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
             this.targetMove = MoveType.RIGHT;
         }
         return false;
+    }
+
+    /**
+     * Sets the turn time
+     * @param time  The turn time in seconds
+     */
+    public void setTime(int time) {
+        this.time = time;
+        int sandX = sandTrickle.getRegionX();
+        sandX++;
+        if (sandX > sandTrickleTexture.getWidth()) {
+            sandX = 0;
+        }
+
+        sandTrickle.setRegionX(sandX);
+        sandTrickle.setRegionWidth(1);
     }
 
     /**
@@ -345,6 +392,9 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
      */
     private void drawTimer() {
         batch.draw(hourGlass, controlBackground.getWidth() - hourGlass.getWidth() - 20, 25);
+        batch.draw(sandTrickle,controlBackground.getWidth() - hourGlass.getWidth() - 7, 30 );
+        batch.draw(sandTop, controlBackground.getWidth() - hourGlass.getWidth() - 16, 72);
+        batch.draw(sandBottom, controlBackground.getWidth() - hourGlass.getWidth() - 16, 28);
     }
 
     /**

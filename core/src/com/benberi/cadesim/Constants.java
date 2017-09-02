@@ -8,7 +8,9 @@ public class Constants {
     public static int PROTOCOL_PORT = 4666;
 
     /**
-     * If to debug packets
+     * If to debug
      */
-    public static boolean PACKET_DEBUG = false;
+    public static boolean PACKET_DEBUG = true;
+
+    public static final int TURN_TIME = 35;
 }

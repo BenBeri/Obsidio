@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.game.scene.GameScene;
+import com.benberi.cadesim.game.scene.impl.battle.GameInformation;
 
 public class ControlAreaScene implements GameScene {
 
@@ -44,7 +45,7 @@ public class ControlAreaScene implements GameScene {
 
     @Override
     public boolean handleDrag(float sx, float sy, float x, float y) {
-        return true;
+        return false;
     }
 
     @Override
@@ -74,5 +75,9 @@ public class ControlAreaScene implements GameScene {
         shapeRenderer.setColor(new Color(68 / 255f, 101 / 255f, 136 / 255f, 1));
         shapeRenderer.rect(0, 197, Gdx.graphics.getWidth(), 1);
         shapeRenderer.end();
+    }
+
+    public BattleControlComponent getBnavComponent() {
+        return control;
     }
 }

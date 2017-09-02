@@ -14,11 +14,17 @@ public class WarFrigate extends Vessel {
 
     @Override
     public void create() {
-        this.setTexture(new Texture("core/assets/vessel/wf/spritesheet.png"));
-        this.setOrientationPack(getContext().getTools().getGson().fromJson(
-                SimpleFileUtils.readStringFromFile("core/assets/vessel/wf/properties.json"),
-                PackedShipOrientation.class));
-        this.setRotationIndex(14);
+        System.out.println("Hey");
+        try {
+            this.setTexture(new Texture("core/assets/vessel/wf/spritesheet.png"));
+            this.setOrientationPack(getContext().getTools().getGson().fromJson(
+                    SimpleFileUtils.readStringFromFile("core/assets/vessel/wf/properties.json"),
+                    PackedShipOrientation.class));
+            this.setRotationIndex(14);
+            System.out.println("Hneyyey");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

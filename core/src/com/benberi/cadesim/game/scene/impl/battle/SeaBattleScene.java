@@ -33,6 +33,11 @@ public class SeaBattleScene implements GameScene {
     private SpriteBatch batch;
 
     /**
+     * Batch for some UI elements over the battle arena
+     */
+    private SpriteBatch uiBatch;
+
+    /**
      * The battle map
      */
     private SeaMap map;
@@ -41,10 +46,6 @@ public class SeaBattleScene implements GameScene {
      * The camera view of the scene
      */
     private OrthographicCamera camera;
-
-    public SeaBattleScene(GameContext context) {
-        this.context = context;
-    }
 
     private Vessel ship;
 
@@ -58,15 +59,22 @@ public class SeaBattleScene implements GameScene {
      */
     private boolean canDragMap;
 
+    private GameInformation information;
+
+
+    public SeaBattleScene(GameContext context) {
+        this.context = context;
+        information = new GameInformation(context, this);
+    }
+
     @Override
     public void create() {
         this.batch = new SpriteBatch();
+        information.create();
         sea = new Texture("core/assets/sea/sea1.png");
         sea.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         map = new SeaMap();
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() - 200);
-        this.ship = new WarFrigate(context);
-        ship.create();
     }
 
     @Override
@@ -75,77 +83,62 @@ public class SeaBattleScene implements GameScene {
         // update the camera
         camera.update();
 
-        /*
-         * Update vessels
-         */
-        for (Vessel vessel : context.getEntities().listVesselEntities()) {
+//        if (ship.isMoving()){
+//
+//            MoveType move = ship.getCurrentPerformingMove();
+//
+//            Vector2 start = ship.getAnimation().getStartPoint();
+//            Vector2 inbetween = ship.getAnimation().getInbetweenPoint();
+//            Vector2 end = ship.getAnimation().getEndPoint();
+//            Vector2 current = ship.getAnimation().getCurrentAnimationLocation();
+//
+//            // calculate step based on progress towards target (0 -> 1)
+//            // float step = 1 - (ship.getEndPoint().dst(ship.getLinearVector()) / ship.getDistanceToEndPoint());
+//            if (move != MoveType.FORWARD) {
+//                ship.getAnimation().addStep(velocityTurns);
+//                // step on curve (0 -> 1), first bezier point, second bezier point, third bezier point, temporary vector for calculations
+//                Bezier.quadratic(current, (float) ship.getAnimation().getCurrentStep(), start.cpy(),
+//                        inbetween.cpy(), end.cpy(), new Vector2());
+//            }
+//            else {
+//                // When ship moving forward, we may not want to use the curve
+//                int add = move.getIncrementXForRotation(ship.getRotationIndex());
+//                if (add == -1 || add == 1) {
+//                    current.x += (velocityForward * (float) add);
+//                }
+//                else {
+//                    add = move.getIncrementYForRotation(ship.getRotationIndex());
+//                    current.y += (velocityForward * (float) add);
+//                }
+//                ship.getAnimation().addStep(velocityForward);
+//            }
+//
+//            int result = (int) (ship.getAnimation().getCurrentStep() * 100);
+//
+//            // check if the step is reached to the end, and dispose the movement
+//            if (result >= 100) {
+//                ship.setX(end.x);
+//                ship.setY(end.y);
+//                ship.setMoving(false);
+//                if (move != MoveType.FORWARD)
+//                    ship.setRotationIndex(ship.getRotationTargetIndex());
+//                if (ship.getTurn().getMove().hasShoots()) {
+//                    ship.performShoot();
+//                }
+//            }
+//            else {
+//                // process move
+//                ship.setX(current.x);
+//                ship.setY(current.y);
+//            }
+//
+//            // tick rotation of the ship image
+//            if (result % 25 == 0) {
+//                ship.tickRotation();
+//            }
+//        }
 
-        }
-
-        if (!ship.isMoving() && !context.getProjectileManager().hasProjectiles()) {
-            VesselMoveTurn turn = ship.getTurn();
-            if (turn != null) {
-                Move move = turn.getMove();
-                if (move != null && move.getType() != MoveType.NONE) {
-                    ship.performMove(move.getType());
-                }
-            }
-        }
-
-        if (ship.isMoving()){
-
-            MoveType move = ship.getCurrentPerformingMove();
-
-            Vector2 start = ship.getAnimation().getStartPoint();
-            Vector2 inbetween = ship.getAnimation().getInbetweenPoint();
-            Vector2 end = ship.getAnimation().getEndPoint();
-            Vector2 current = ship.getAnimation().getCurrentAnimationLocation();
-
-            // calculate step based on progress towards target (0 -> 1)
-            // float step = 1 - (ship.getEndPoint().dst(ship.getLinearVector()) / ship.getDistanceToEndPoint());
-            if (move != MoveType.FORWARD) {
-                ship.getAnimation().addStep(velocityTurns);
-                // step on curve (0 -> 1), first bezier point, second bezier point, third bezier point, temporary vector for calculations
-                Bezier.quadratic(current, (float) ship.getAnimation().getCurrentStep(), start.cpy(),
-                        inbetween.cpy(), end.cpy(), new Vector2());
-            }
-            else {
-                // When ship moving forward, we may not want to use the curve
-                int add = move.getIncrementXForRotation(ship.getRotationIndex());
-                if (add == -1 || add == 1) {
-                    current.x += (velocityForward * (float) add);
-                }
-                else {
-                    add = move.getIncrementYForRotation(ship.getRotationIndex());
-                    current.y += (velocityForward * (float) add);
-                }
-                ship.getAnimation().addStep(velocityForward);
-            }
-
-            int result = (int) (ship.getAnimation().getCurrentStep() * 100);
-
-            // check if the step is reached to the end, and dispose the movement
-            if (result >= 100) {
-                ship.setX(end.x);
-                ship.setY(end.y);
-                ship.setMoving(false);
-                if (move != MoveType.FORWARD)
-                    ship.setRotationIndex(ship.getRotationTargetIndex());
-                if (ship.getTurn().getMove().hasShoots()) {
-                    ship.performShoot();
-                }
-            }
-            else {
-                // process move
-                ship.setX(current.x);
-                ship.setY(current.y);
-            }
-
-            // tick rotation of the ship image
-            if (result % 25 == 0) {
-                ship.tickRotation();
-            }
-        }
+        information.update();
     }
 
     @Override
@@ -164,6 +157,12 @@ public class SeaBattleScene implements GameScene {
         renderEntities();
 
         batch.end();
+
+        information.render();
+    }
+
+    public GameInformation getInformation() {
+        return information;
     }
 
     /**
@@ -190,7 +189,7 @@ public class SeaBattleScene implements GameScene {
             float y = getIsometricY(vessel.getX(), vessel.getY(), vessel);
 
             // draw vessel
-            batch.draw(ship, x + ship.getOrientationLocation().getOffsetx(), y + ship.getOrientationLocation().getOffsety());
+            batch.draw(vessel, x + vessel.getOrientationLocation().getOffsetx(), y + vessel.getOrientationLocation().getOffsety());
         }
     }
 

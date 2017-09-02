@@ -15,8 +15,8 @@ public class SetTimePacket extends ClientPacketExecutor {
         int gameTime = p.readInt();
         int turnTime = p.readInt();
 
-        System.out.println("Game time: " + gameTime);
-        System.out.println("Turn time: " + turnTime);
+        getContext().getControlScene().getBnavComponent().setTime(turnTime);
+        getContext().getBattleScene().getInformation().setTime(gameTime);
 
     }
 
