@@ -46,8 +46,14 @@ public class GameClient extends Bootstrap implements Runnable {
 
         try {
             f = connect("127.0.0.1", Constants.PROTOCOL_PORT).sync();
+            if (f.isSuccess()) {
+                context.setServerChannel(f.channel());
+                context.setConnect(true);
+                context.sendRegistration();
+            }
             f.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
+            context.getConnectScene().setFailed(true);
             e.printStackTrace();
         } finally {
             worker.shutdownGracefully();

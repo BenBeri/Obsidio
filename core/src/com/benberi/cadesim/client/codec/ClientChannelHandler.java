@@ -2,6 +2,8 @@ package com.benberi.cadesim.client.codec;
 
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.client.codec.util.Packet;
+import com.benberi.cadesim.client.packet.out.RegisterPacket;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
 
@@ -14,8 +16,7 @@ public class ClientChannelHandler implements ChannelInboundHandler {
     }
 
     @Override
-    public void channelRegistered(ChannelHandlerContext channelHandlerContext) throws Exception {
-
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
     }
 
     @Override

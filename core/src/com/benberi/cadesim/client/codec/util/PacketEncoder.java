@@ -30,6 +30,6 @@ public class PacketEncoder extends MessageToByteEncoder<Packet> {
                 break;
         }
         buffer.writeBytes(packet.getBuffer());
-        ctx.channel().writeAndFlush(buffer);
+        ctx.channel().writeAndFlush(buffer.retain());
     }
 }
