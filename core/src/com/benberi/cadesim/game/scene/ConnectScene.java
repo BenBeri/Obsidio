@@ -2,11 +2,17 @@ package com.benberi.cadesim.game.scene;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.benberi.cadesim.GameContext;
 
 public class ConnectScene implements GameScene {
@@ -31,6 +37,9 @@ public class ConnectScene implements GameScene {
 
     private boolean failed;
 
+    private Stage stage;
+    private TextField text;
+
     public ConnectScene(GameContext ctx) {
         this.context = ctx;
     }
@@ -40,6 +49,7 @@ public class ConnectScene implements GameScene {
 		/*
 		 * OPENING SCREEN
 		 */
+		Skin skin = new Skin();
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("core/assets/font/FjallaOne-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -50,6 +60,20 @@ public class ConnectScene implements GameScene {
         font.setColor(Color.YELLOW);
         batch = new SpriteBatch();
         background = new Texture("core/assets/bg.png");
+
+        stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+        Gdx.input.setInputProcessor(stage);
+        TextField.TextFieldStyle style = new TextField.TextFieldStyle();
+        style.font = font;
+        style.fontColor = Color.BLACK;
+        style.cursor =
+        style.selection = new Image(new Texture("core/assets/skin/textfield-big.png")).getDrawable();
+        style.background = new Image(new Texture("core/assets/skin/textfield-big.png")).getDrawable();
+        text = new TextField("Name", style);
+        text.setWidth(500);
+        text.setHeight(37);
+        text.setPosition(50, 50);
+        stage.addActor(text);
     }
 
     @Override
@@ -107,6 +131,9 @@ public class ConnectScene implements GameScene {
         }
 
         batch.end();
+
+        stage.act();
+        stage.draw();
     }
 
     @Override
