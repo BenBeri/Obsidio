@@ -1,6 +1,7 @@
 package com.benberi.cadesim.game.scene.impl.control;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -124,13 +125,20 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
     private Texture autoOn;
     private Texture autoOff;
 
+    private boolean isBigShip;
+
     protected BattleControlComponent(GameContext context, ControlAreaScene owner, boolean big) {
         super(context, owner);
         if (big) {
             movesHolder = new BigShipHandMove[4];
+            isBigShip = true;
         }
         else {
             movesHolder = new SmallShipHandMove[4];
+        }
+
+        for (int i = 0; i < movesHolder.length; i++) {
+            movesHolder[i] = createMove();
         }
     }
 
@@ -200,7 +208,12 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
 
     }
 
-
+    public HandMove createMove() {
+        if (isBigShip) {
+            return new BigShipHandMove();
+        }
+        return new SmallShipHandMove();
+    }
 
     @Override
     public void update() {
@@ -222,8 +235,23 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
     }
 
     @Override
-    public boolean handleClick(float x, float y) {
-        if (isChosedLeft(x, y)) {
+    public boolean handleClick(float x, float y, int button) {
+        System.out.println(x + " " + y);
+        if (isPlacingMoves(x, y)) {
+            if (y >= 538 && y <= 569) {
+                handleMovePlace(0, button);
+            }
+            else if (y >= 573 && y <= 603) {
+                handleMovePlace(1, button);
+            }
+            else if (y >= 606 && y <= 637) {
+                handleMovePlace(2, button);
+            }
+            else if(y >= 642 && y <= 670) {
+                handleMovePlace(3, button);
+            }
+        }
+        else if (isChosedLeft(x, y)) {
             this.targetMove = MoveType.LEFT;
         }
         else if (isChosedForward(x, y)) {
@@ -233,6 +261,94 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
             this.targetMove = MoveType.RIGHT;
         }
         return false;
+    }
+
+    private void handleMovePlace(int position, int button) {
+        HandMove move = movesHolder[position];
+        if (move.getMove() == MoveType.NONE) {
+            if (button == Input.Buttons.LEFT) {
+                //move.setMove(MoveType.LEFT);
+                if (leftMoves > 0) {
+                    getContext().sendSelectMoveSlot(position, MoveType.LEFT);
+                }
+                else if (forwardMoves > 0) {
+                    getContext().sendSelectMoveSlot(position, MoveType.FORWARD);
+                }
+                else if (rightMoves > 0) {
+                    getContext().sendSelectMoveSlot(position, MoveType.RIGHT);
+                }
+            }
+            else if (button == Input.Buttons.MIDDLE) {
+               // move.setMove(MoveType.FORWARD);
+                if (forwardMoves > 0) {
+                    getContext().sendSelectMoveSlot(position, MoveType.FORWARD);
+                }
+                else if (rightMoves > 0) {
+                    getContext().sendSelectMoveSlot(position, MoveType.RIGHT);
+                }
+                else if (leftMoves > 0) {
+                    getContext().sendSelectMoveSlot(position, MoveType.LEFT);
+                }
+            }
+            else if (button == Input.Buttons.RIGHT) {
+               // move.setMove(MoveType.RIGHT);
+                if (rightMoves > 0) {
+                    getContext().sendSelectMoveSlot(position, MoveType.RIGHT);
+                }
+                else if (leftMoves > 0) {
+                    getContext().sendSelectMoveSlot(position, MoveType.LEFT);
+                }
+                else if (forwardMoves > 0) {
+                    getContext().sendSelectMoveSlot(position, MoveType.FORWARD);
+                }
+            }
+        }
+        else {
+            if (button == Input.Buttons.LEFT) {
+               // move.setMove(move.getMove().getNext());
+                MoveType next = move.getMove().getNext();
+                if (hasMove(next)) {
+                    getContext().sendSelectMoveSlot(position, next);
+                }
+                else if (hasMove(next.getNext())) {
+                    getContext().sendSelectMoveSlot(position, next.getNext());
+                }
+                else if (hasMove(next.getNext().getNext())) {
+                    getContext().sendSelectMoveSlot(position, next.getNext().getNext());
+                }
+            }
+            else if (button == Input.Buttons.RIGHT) {
+               // move.setMove(move.getMove().getPrevious());
+                MoveType prev = move.getMove().getPrevious();
+                if (hasMove(prev)) {
+                    getContext().sendSelectMoveSlot(position, prev);
+                }
+                else if (hasMove(prev.getPrevious())) {
+                    getContext().sendSelectMoveSlot(position, prev.getPrevious());
+                }
+                else if (hasMove(prev.getPrevious().getPrevious())) {
+                    getContext().sendSelectMoveSlot(position, prev.getPrevious().getPrevious());
+                }
+            }
+        }
+
+    }
+
+    private boolean hasMove(MoveType move) {
+        switch (move) {
+            case LEFT:
+                return leftMoves > 0;
+            case RIGHT:
+                return rightMoves > 0;
+            case FORWARD:
+                return forwardMoves > 0;
+            default:
+                return true;
+        }
+    }
+
+    private boolean isPlacingMoves(float x, float y) {
+        return x >= 208 && x <= 239;
     }
 
     /**
@@ -328,7 +444,23 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
                 batch.draw(emptyCannonRight, controlBackground.getWidth() - shiphand.getWidth() - 20, height);
             }
 
+            if (move.getMove() != MoveType.NONE) {
+                batch.draw(getTextureForMove(move.getMove()), controlBackground.getWidth() - shiphand.getWidth() - 64, height - 4);
+            }
+
             height -= 34;
+        }
+    }
+
+    private TextureRegion getTextureForMove(MoveType type) {
+        switch (type) {
+            case LEFT:
+                return leftMoveTexture;
+            case RIGHT:
+                return rightMoveTexture;
+            default:
+            case FORWARD:
+                return forwardMoveTexture;
         }
     }
 
@@ -444,5 +576,16 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
 
     public boolean isChosedRight(float x, float y) {
         return x >= 140 && x <= 166 && y >= 598 && y <= 624;
+    }
+
+    public void placeMove(int slot, MoveType move) {
+        HandMove hm = movesHolder[slot];
+        hm.setMove(move);
+    }
+
+    public void resetMoves() {
+        for (int i = 0; i < movesHolder.length; i++) {
+            movesHolder[i].setMove(MoveType.NONE);
+        }
     }
 }

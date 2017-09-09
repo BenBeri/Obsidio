@@ -10,7 +10,7 @@ public class Constants {
     /**
      * If to debug
      */
-    public static boolean PACKET_DEBUG = true;
+    public static boolean PACKET_DEBUG = false;
 
     public static final int TURN_TIME = 35;
 }

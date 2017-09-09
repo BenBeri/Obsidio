@@ -32,7 +32,7 @@ public class GameInputProcessor implements InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         for (GameScene scene : context.getScenes()) {
-            if (scene.handleClick(screenX, screenY)) {
+            if (scene.handleClick(screenX, screenY, button)) {
                 break;
             }
         }
@@ -43,7 +43,7 @@ public class GameInputProcessor implements InputProcessor {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         for (GameScene scene : context.getScenes()) {
-            if (scene.handleClickRelease(screenX, screenY)) {
+            if (scene.handleClickRelease(screenX, screenY, button)) {
                 break;
             }
         }

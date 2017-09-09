@@ -25,19 +25,26 @@ public class EntityManager {
      * Adds an entity
      */
     public void addEntity(String name, int x, int y, int face) {
-        Gdx.app.postRunnable(new Runnable(){
-            @Override
-            public void run() {
-                WarFrigate wf = new WarFrigate(context);
-                wf.create();
-                entities.add(wf);
-            }
-        });
+        WarFrigate wf = new WarFrigate(context, name, x, y, face);
+        wf.create();
+        entities.add(wf);
+    }
 
-
+    public Vessel getVessel(int index) {
+        return entities.get(index);
     }
 
     public List<Vessel> listVesselEntities() {
         return entities;
+    }
+
+    public Vessel getVesselByName(String name) {
+        for (Vessel vessel : entities) {
+            if (vessel.getName().equalsIgnoreCase(name)) {
+                return vessel;
+            }
+        }
+
+        return null;
     }
 }

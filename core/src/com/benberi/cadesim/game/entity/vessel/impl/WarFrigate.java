@@ -1,27 +1,27 @@
 package com.benberi.cadesim.game.entity.vessel.impl;
 
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.Gdx;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.game.entity.vessel.Vessel;
 import com.benberi.cadesim.util.PackedShipOrientation;
-import com.benberi.cadesim.util.SimpleFileUtils;
+import com.benberi.cadesim.util.RandomUtils;
 
 public class WarFrigate extends Vessel {
 
-    public WarFrigate(GameContext context) {
-        super(context);
+    public WarFrigate(GameContext context, String name, int x, int y, int face) {
+        super(context, name, x, y, face);
     }
 
     @Override
     public void create() {
-        System.out.println("Hey");
         try {
-            this.setTexture(new Texture("core/assets/vessel/wf/spritesheet.png"));
+            this.setTexture(getContext().getTextures().getVessel("warfrigate"));
+
             this.setOrientationPack(getContext().getTools().getGson().fromJson(
-                    SimpleFileUtils.readStringFromFile("core/assets/vessel/wf/properties.json"),
+                    Gdx.files.internal("core/assets/vessel/wf/properties.json").readString(),
                     PackedShipOrientation.class));
+
             this.setRotationIndex(14);
-            System.out.println("Hneyyey");
         } catch (Exception e) {
             e.printStackTrace();
         }

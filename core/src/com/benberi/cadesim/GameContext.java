@@ -1,14 +1,22 @@
 package com.benberi.cadesim;
 
 
+import com.badlogic.gdx.Gdx;
+import com.benberi.cadesim.client.ClientConnectionCallback;
+import com.benberi.cadesim.client.ClientConnectionTask;
 import com.benberi.cadesim.client.codec.util.Packet;
 import com.benberi.cadesim.client.packet.ClientPacketHandler;
-import com.benberi.cadesim.client.packet.out.RegisterPacket;
+import com.benberi.cadesim.client.packet.OutgoingPacket;
+import com.benberi.cadesim.client.packet.in.LoginResponsePacket;
+import com.benberi.cadesim.client.packet.out.LoginPacket;
+import com.benberi.cadesim.client.packet.out.PlaceMovePacket;
 import com.benberi.cadesim.game.entity.EntityManager;
 import com.benberi.cadesim.game.entity.projectile.ProjectileManager;
+import com.benberi.cadesim.game.entity.vessel.move.MoveType;
 import com.benberi.cadesim.game.scene.ConnectScene;
+import com.benberi.cadesim.game.scene.ConnectionSceneState;
 import com.benberi.cadesim.game.scene.GameScene;
-import com.benberi.cadesim.game.scene.impl.battle.GameInformation;
+import com.benberi.cadesim.game.scene.TextureCollection;
 import com.benberi.cadesim.game.scene.impl.battle.SeaBattleScene;
 import com.benberi.cadesim.game.scene.impl.control.ControlAreaScene;
 import com.benberi.cadesim.input.GameInputProcessor;
@@ -17,6 +25,8 @@ import io.netty.channel.Channel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class GameContext {
 
@@ -41,6 +51,11 @@ public class GameContext {
      * The control area scene
      */
     private ControlAreaScene controlArea;
+
+    /**
+     * The texture collection
+     */
+    private TextureCollection textures;
 
     /**
      * The projectile manager
@@ -68,6 +83,11 @@ public class GameContext {
     private boolean isReady = false;
 
     /**
+     * Executors service
+     */
+    private ExecutorService service = Executors.newSingleThreadExecutor();
+
+    /**
      * Public GSON object
      */
     private GameToolsContainer tools;
@@ -89,6 +109,9 @@ public class GameContext {
      * Create!
      */
     public void create() {
+        textures = new TextureCollection(this);
+        textures.create();
+
         this.input = new GameInputProcessor(this);
         this.projectileManager = new ProjectileManager();
         this.seaBattleScene = new SeaBattleScene(this);
@@ -135,6 +158,15 @@ public class GameContext {
     public void handlePacket(Packet o) {
     }
 
+
+    /**
+     * Gets the texture collection
+     * @return {@link #textures}
+     */
+    public TextureCollection getTextures() {
+         return this.textures;
+    }
+
     /**
      * Gets the packet handler
      * @return {@link #packets}
@@ -168,22 +200,107 @@ public class GameContext {
     }
 
     /**
-     * Sends the registration packet
+     * Sends a packet
+     * @param p The packet to send
      */
-    public void sendRegistration() {
-        Packet packet = new RegisterPacket(this);
+    public void sendPacket(OutgoingPacket p) {
+        p.encode();
+        serverChannel.write(p);
+        serverChannel.flush();
+    }
+
+    /**
+     * Gets the connection scene
+     * @return  {@link #connectScene}
+     */
+    public ConnectScene getConnectScene() {
+        return connectScene;
+    }
+
+    /**
+     * Sends a login packet to the server with the given display name
+     * @param display   The display name
+     */
+    public void sendLoginPacket(String display) {
+        LoginPacket packet = new LoginPacket();
+        packet.setName(display);
         sendPacket(packet);
     }
 
     /**
-     * Sends a packet
-     * @param p The packet to send
+     * Sends a move placement packet
+     * @param slot  The slot to place
+     * @param move  The move to place
      */
-    public void sendPacket(Packet p) {
-        serverChannel.write(p);
+    public void sendSelectMoveSlot(int slot, MoveType move) {
+        PlaceMovePacket packet = new PlaceMovePacket();
+        packet.setSlot(slot);
+        packet.setMove(move.getId());
+        sendPacket(packet);
     }
 
-    public ConnectScene getConnectScene() {
-        return connectScene;
+
+    /**
+     * Attempts to connect to server
+     *
+     * @param displayName   The display name
+     * @param ip            The IP Address to connect
+     */
+    public void connect(final String displayName, String ip) {
+        service.execute(new ClientConnectionTask(this, ip, new ClientConnectionCallback() {
+            @Override
+            public void onSuccess(Channel channel) {
+                serverChannel = channel; // initialize the server channel
+                connectScene.setState(ConnectionSceneState.CREATING_PROFILE);
+                sendLoginPacket(displayName); // send login packet
+            }
+
+            @Override
+            public void onFailure() {
+                connectScene.setState(ConnectionSceneState.DEFAULT);
+                connectScene.loginFailed();
+            }
+        }));
+    }
+
+    /**
+     * Handles a login response form the server
+     *
+     * @param response  The response code
+     */
+    public void handleLoginResponse(int response) {
+        if (response != LoginResponsePacket.SUCCESS) {
+            serverChannel.disconnect();
+
+            switch (response) {
+                case LoginResponsePacket.NAME_IN_USE:
+                    connectScene.setPopup("Display name already in use");
+                    break;
+                case LoginResponsePacket.SERVER_FULL:
+                    connectScene.setPopup("The server is full.");
+                    break;
+                default:
+                    connectScene.setPopup("Unknown login failure.");
+                    break;
+            }
+
+            connectScene.setState(ConnectionSceneState.DEFAULT);
+        }
+        else {
+            connectScene.setState(ConnectionSceneState.CREATING_MAP);
+        }
+
+    }
+
+    public void setReady(boolean ready) {
+        this.isReady = ready;
+        Gdx.input.setInputProcessor(input);
+    }
+
+    public void dispose() {
+        isReady = false;
+        connected = false;
+        connectScene.setup();
+        connectScene.setPopup("You have disconnected from the server.");
     }
 }

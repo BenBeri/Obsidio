@@ -99,7 +99,7 @@ public class GameInformation extends SceneComponent {
     }
 
     @Override
-    public boolean handleClick(float x, float y) {
+    public boolean handleClick(float x, float y, int button) {
         return false;
     }
 }

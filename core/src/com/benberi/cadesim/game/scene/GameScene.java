@@ -37,13 +37,13 @@ public interface GameScene {
      * @param x click-x
      * @param y click-y
      */
-    boolean handleClick(float x, float y);
+    boolean handleClick(float x, float y, int button);
 
     /**
      * Handles click release on screen
      * @param x click-x
      * @param y click-y
      */
-    boolean handleClickRelease(float x, float y);
+    boolean handleClickRelease(float x, float y, int button);
 
 }

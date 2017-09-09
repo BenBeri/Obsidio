@@ -4,24 +4,26 @@ import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.client.codec.util.Packet;
 import com.benberi.cadesim.client.packet.ClientPacketExecutor;
 
-public class SendMapPacket extends ClientPacketExecutor {
+public class SetPlayersPacket extends ClientPacketExecutor {
 
-    public SendMapPacket(GameContext ctx) {
+    public SetPlayersPacket(GameContext ctx) {
         super(ctx);
     }
 
     @Override
     public void execute(Packet p) {
-        int[][] map = new int[20][36];
-        while(p.getBuffer().readableBytes() >= 3) {
-            int tile = p.readByte();
+
+        int size = p.readByte();
+
+        for (int i = 0; i < size; i++) {
+            String name = p.readByteString();
             int x = p.readByte();
             int y = p.readByte();
-            map[x][y] = tile;
+            int face = p.readByte();
+            getContext().getEntities().addEntity(name, x, y, face);
         }
 
-        getContext().getBattleScene().createMap(map);
-        getContext().setReady(true);
+
     }
 
     @Override

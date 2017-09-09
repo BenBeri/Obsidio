@@ -7,12 +7,20 @@ import com.benberi.cadesim.game.entity.vessel.move.MoveType;
 import com.benberi.cadesim.game.entity.vessel.move.VesselMoveTurn;
 import com.benberi.cadesim.util.OrientationLocation;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 /**
  * Represents a vessel abstraction
  */
 public abstract class Vessel extends Entity {
 
     public static final int ROTATION_TICK_DELAY = 200;
+
+    /**
+     * The name of this vessel player
+     */
+    private String name;
 
     /**
      * The damage of this vessel
@@ -52,7 +60,7 @@ public abstract class Vessel extends Entity {
     /**
      * Current performing move
      */
-    private MoveType currentPerformingMove;
+    private VesselMovementAnimation currentPerformingMove;
 
     /**
      * The current turn
@@ -64,8 +72,13 @@ public abstract class Vessel extends Entity {
      */
     private boolean isPerformingShoot;
 
-    public Vessel(GameContext context) {
+    private Queue<VesselMovementAnimation> animations = new LinkedList<VesselMovementAnimation>();
+
+    public Vessel(GameContext context, String name, int x, int y, int face) {
         super(context);
+        this.name = name;
+        this.setPosition(x, y);
+        this.rotationIndex = face;
         turn = new VesselMoveTurn();
     }
 
@@ -73,13 +86,17 @@ public abstract class Vessel extends Entity {
      * Starts to perform a given move
      * @param move The move to perform
      */
-    public void performMove(MoveType move) {
+    public void performMove(VesselMovementAnimation move) {
+        if (move == VesselMovementAnimation.NO_ANIMATION) {
+            animations.poll();
+            return;
+        }
         Vector2 start = new Vector2(this.getX(), this.getY());
         Vector2 currentAnimationLocation = start.cpy();
         this.currentPerformingMove = move;
 
         Vector2 inbetween = null;
-        if (move != MoveType.FORWARD) {
+        if (move != VesselMovementAnimation.MOVE_FORWARD) {
             // Get the inbetween block by using forward
             inbetween = new Vector2(start.x + MoveType.FORWARD.getIncrementXForRotation(rotationIndex),
                     start.y + MoveType.FORWARD.getIncrementYForRotation(rotationIndex));
@@ -92,6 +109,14 @@ public abstract class Vessel extends Entity {
         Vector2 linear = start.cpy();
         this.animation = new VesselAnimationVector(start, inbetween, end, currentAnimationLocation, linear);
         setMoving(true);
+    }
+
+    public Queue<VesselMovementAnimation> getAnimationsQueue() {
+        return animations;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public VesselMoveTurn getTurn() {
@@ -110,7 +135,7 @@ public abstract class Vessel extends Entity {
      * Gets the current performing move
      * @return {@link #currentPerformingMove}
      */
-    public MoveType getCurrentPerformingMove() {
+    public VesselMovementAnimation getCurrentPerformingMove() {
         return this.currentPerformingMove;
     }
 
@@ -184,10 +209,10 @@ public abstract class Vessel extends Entity {
         if (rotationIndex == rotationTargetIndex) {
             return;
         }
-        if (currentPerformingMove == MoveType.LEFT) {
+        if (currentPerformingMove == VesselMovementAnimation.TURN_LEFT) {
             this.rotationIndex--;
         }
-        else if (currentPerformingMove == MoveType.RIGHT) {
+        else if (currentPerformingMove == VesselMovementAnimation.TURN_RIGHT) {
             this.rotationIndex++;
         }
 

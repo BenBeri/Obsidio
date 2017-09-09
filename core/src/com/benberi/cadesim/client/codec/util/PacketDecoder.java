@@ -134,7 +134,6 @@ public class PacketDecoder extends StatefulByteDecoder<PacketDecodeState> {
             if (Constants.PACKET_DEBUG)
                 System.out.println("data length: " + data.readableBytes());
 
-            buffer.clear();
             setState(PacketDecodeState.OPCODE);
         }
     }

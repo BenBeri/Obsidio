@@ -11,7 +11,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-public class GameClient extends Bootstrap implements Runnable {
+public class ClientConnectionTask extends Bootstrap implements Runnable {
 
     /**
      * The game context
@@ -23,15 +23,27 @@ public class GameClient extends Bootstrap implements Runnable {
      */
     private EventLoopGroup worker = new NioEventLoopGroup(1);
 
-    public GameClient(GameContext ctx) {
-        this.context = ctx;
+    /**
+     * The IP Address to connect
+     */
+    private String ip;
+
+    /**
+     * The callback to notify
+     */
+    private ClientConnectionCallback callback;
+
+    public ClientConnectionTask(GameContext context, String ip, ClientConnectionCallback callback) {
+        this.context = context;
+        this.ip = ip;
+        this.callback = callback;
     }
 
     @Override
     public void run() {
         group(worker);
         channel(NioSocketChannel.class);
-        //option(ChannelOption.TCP_NODELAY, true);
+        option(ChannelOption.TCP_NODELAY, true);
         handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
@@ -45,16 +57,15 @@ public class GameClient extends Bootstrap implements Runnable {
         ChannelFuture f = null;
 
         try {
-            f = connect("127.0.0.1", Constants.PROTOCOL_PORT).sync();
+            f = connect(ip, Constants.PROTOCOL_PORT).sync();
             if (f.isSuccess()) {
-                context.setServerChannel(f.channel());
-                context.setConnect(true);
-                context.sendRegistration();
+                callback.onSuccess(f.channel());
             }
             f.channel().closeFuture().sync();
+            context.dispose();
         } catch (Exception e) {
-            context.getConnectScene().setFailed(true);
             e.printStackTrace();
+            callback.onFailure();
         } finally {
             worker.shutdownGracefully();
         }

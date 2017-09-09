@@ -49,15 +49,15 @@ public class ControlAreaScene implements GameScene {
     }
 
     @Override
-    public boolean handleClick(float x, float y) {
-        if (control.handleClick(x, y)) {
+    public boolean handleClick(float x, float y, int button) {
+        if (control.handleClick(x, y, button)) {
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean handleClickRelease(float x, float y) {
+    public boolean handleClickRelease(float x, float y, int button) {
         return false;
     }
 

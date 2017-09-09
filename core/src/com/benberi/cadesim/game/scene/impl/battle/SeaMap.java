@@ -24,20 +24,28 @@ public class SeaMap {
      */
     private GameTile[][] tiles = new GameTile[MAP_WIDTH][MAP_HEIGHT];
 
-    public SeaMap() {
-        Cell cell = new Cell(0);
+    public SeaMap(int[][] map) {
         SafeZone safe = new SafeZone(0);
+
         for (int i = 0; i < tiles.length; i++) {
             for(int j = 0; j < tiles[i].length; j++) {
                 if (j < 3) {
                     tiles[i][j] = safe;
                 }
                 else {
-                    tiles[i][j] = cell;
+                    int tile = map[i][j];
+                    tiles[i][j] = getTileForId(tile);
                 }
 
             }
         }
+    }
+
+    private GameTile getTileForId(int id) {
+        if (id == 0) {
+            return new Cell(0);
+        }
+        return new Cell(0); // todo change to null
     }
 
     public GameTile[][] getTiles() {
