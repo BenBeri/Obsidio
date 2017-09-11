@@ -11,7 +11,6 @@ import com.benberi.cadesim.client.packet.in.LoginResponsePacket;
 import com.benberi.cadesim.client.packet.out.LoginPacket;
 import com.benberi.cadesim.client.packet.out.PlaceMovePacket;
 import com.benberi.cadesim.game.entity.EntityManager;
-import com.benberi.cadesim.game.entity.projectile.ProjectileManager;
 import com.benberi.cadesim.game.entity.vessel.move.MoveType;
 import com.benberi.cadesim.game.scene.ConnectScene;
 import com.benberi.cadesim.game.scene.ConnectionSceneState;
@@ -56,11 +55,6 @@ public class GameContext {
      * The texture collection
      */
     private TextureCollection textures;
-
-    /**
-     * The projectile manager
-     */
-    private ProjectileManager projectileManager;
 
     /**
      * The entity manager
@@ -113,7 +107,6 @@ public class GameContext {
         textures.create();
 
         this.input = new GameInputProcessor(this);
-        this.projectileManager = new ProjectileManager();
         this.seaBattleScene = new SeaBattleScene(this);
         seaBattleScene.create();
         this.controlArea = new ControlAreaScene(this);
@@ -129,10 +122,6 @@ public class GameContext {
 
     public List<GameScene> getScenes() {
         return this.scenes;
-    }
-
-    public ProjectileManager getProjectileManager() {
-        return this.projectileManager;
     }
 
     public EntityManager getEntities() {

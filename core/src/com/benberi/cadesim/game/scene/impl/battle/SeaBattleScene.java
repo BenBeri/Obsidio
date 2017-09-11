@@ -13,14 +13,15 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Bezier;
 import com.badlogic.gdx.math.Vector2;
 import com.benberi.cadesim.GameContext;
+import com.benberi.cadesim.game.entity.projectile.CannonBall;
 import com.benberi.cadesim.game.entity.vessel.Vessel;
 import com.benberi.cadesim.game.entity.vessel.VesselMovementAnimation;
 import com.benberi.cadesim.game.entity.vessel.impl.WarFrigate;
-import com.benberi.cadesim.game.entity.vessel.move.Move;
-import com.benberi.cadesim.game.entity.vessel.move.MoveType;
-import com.benberi.cadesim.game.entity.vessel.move.VesselMoveTurn;
+import com.benberi.cadesim.game.entity.vessel.move.*;
 import com.benberi.cadesim.game.scene.GameScene;
 import com.benberi.cadesim.game.scene.impl.battle.tile.GameTile;
+
+import java.util.Iterator;
 
 public class SeaBattleScene implements GameScene {
 
@@ -70,6 +71,9 @@ public class SeaBattleScene implements GameScene {
 
     private long lastMove;
 
+    private int currentSlot = -1;
+    private MovePhase currentPhase;
+
     public SeaBattleScene(GameContext context) {
         this.context = context;
         information = new GameInformation(context, this);
@@ -103,9 +107,78 @@ public class SeaBattleScene implements GameScene {
         // update the camera
         camera.update();
 
-        for (Vessel vessel : context.getEntities().listVesselEntities()) {
-            if (vessel.isMoving()) {
+        if (currentSlot > -1) {
+            if (context.getEntities().countVsselsByPhase(currentPhase) == context.getEntities().count()) {
+                MovePhase phase = MovePhase.getNext(currentPhase);
+                if (phase == null) {
+                    currentPhase = MovePhase.MOVE_TOKEN;
+                    currentSlot++;
 
+                    for (Vessel v : context.getEntities().listVesselEntities()) {
+                        v.setMovePhase(null);
+                    }
+
+                    if (currentSlot > 3) {
+                        currentSlot = -1;
+                    }
+                }
+                else {
+                    currentPhase = phase;
+                }
+            }
+        }
+
+        for (Vessel vessel : context.getEntities().listVesselEntities()) {
+            if (!vessel.isMoving()) {
+                if (currentSlot != -1) {
+                    MoveAnimationTurn turn = vessel.getStructure().getTurn(currentSlot);
+                    if (currentPhase == MovePhase.MOVE_TOKEN && vessel.getMovePhase() == null) {
+                        if (turn.getAnimation() != VesselMovementAnimation.NO_ANIMATION) {
+                            vessel.performMove(turn.getAnimation());
+                            turn.setAnimation(VesselMovementAnimation.NO_ANIMATION);
+                        }
+                        else {
+                            vessel.setMovePhase(MovePhase.getNext(vessel.getMovePhase()));
+                        }
+                    }
+                    else if (currentPhase == MovePhase.ACTION_MOVE && vessel.getMovePhase() == MovePhase.MOVE_TOKEN) {
+                        if (turn.getSubAnimation() != VesselMovementAnimation.NO_ANIMATION) {
+                            vessel.performMove(turn.getSubAnimation());
+                            turn.setSubAnimation(VesselMovementAnimation.NO_ANIMATION);
+                        }
+                        else {
+                            vessel.setMovePhase(MovePhase.getNext(vessel.getMovePhase()));
+                        }
+                    }
+                    else if (currentPhase == MovePhase.SHOOT && vessel.getMovePhase() == MovePhase.ACTION_MOVE) {
+                        if (turn.getLeftShoots() == 0 && turn.getRightShoots() == 0) {
+                            vessel.setMovePhase(MovePhase.getNext(vessel.getMovePhase()));
+                        }
+                        else {
+                            if (turn.getLeftShoots() > 0) {
+                                vessel.performLeftShoot(turn.getLeftShoots());
+                                turn.setLeftShoots(0);
+                            }
+                            if (turn.getRightShoots() > 0) {
+                                vessel.performRightShoot(turn.getRightShoots());
+                                turn.setRightShoots(0);
+                            }
+                        }
+                    }
+                }
+
+                Iterator<CannonBall> itr = vessel.getCannonballs().iterator();
+                while (itr.hasNext()) {
+                    CannonBall c = itr.next();
+                    if (!c.reached()) {
+                        c.move();
+                    }
+                    else {
+                        itr.remove();
+                    }
+                }
+            }
+            else {
                 VesselMovementAnimation move = vessel.getCurrentPerformingMove();
 
                 Vector2 start = vessel.getAnimation().getStartPoint();
@@ -141,14 +214,11 @@ public class SeaBattleScene implements GameScene {
                     vessel.setX(end.x);
                     vessel.setY(end.y);
                     vessel.setMoving(false);
+
                     if (move != VesselMovementAnimation.MOVE_FORWARD)
                         vessel.setRotationIndex(vessel.getRotationTargetIndex());
-                    if (vessel.getTurn().getMove().hasShoots()) {
-                        vessel.performShoot();
-                    }
 
-                    vessel.getAnimationsQueue().poll();
-                    lastMove = System.currentTimeMillis();
+                    vessel.setMovePhase(MovePhase.getNext(vessel.getMovePhase()));
                 }
                 else {
                     // process move
@@ -159,12 +229,6 @@ public class SeaBattleScene implements GameScene {
                 // tick rotation of the ship image
                 if (result % 25 == 0) {
                     vessel.tickRotation();
-                }
-            }
-            else {
-                if (!vessel.getAnimationsQueue().isEmpty() && System.currentTimeMillis() - lastMove >= 200) {
-                    VesselMovementAnimation animation = vessel.getAnimationsQueue().peek();
-                    vessel.performMove(animation);
                 }
             }
         }
@@ -226,6 +290,12 @@ public class SeaBattleScene implements GameScene {
 
             GlyphLayout layout = new GlyphLayout(font, name);
             font.draw(batch, name, x + (vessel.getRegionWidth() / 2) - (layout.width / 2), y + vessel.getRegionHeight() * 1.6f);
+
+            for (CannonBall c : vessel.getCannonballs()) {
+                float cx = getIsometricX(c.getX(), c.getY(), c);
+                float cy = getIsometricY(c.getX(), c.getY(), c);
+                batch.draw(c, cx, cy);
+            }
         }
     }
 
@@ -293,6 +363,14 @@ public class SeaBattleScene implements GameScene {
                 batch.draw(texture, x, y);
 
             }
+        }
+    }
+
+    public void setTurnExecute() {
+        this.currentSlot = 0;
+        this.currentPhase = MovePhase.MOVE_TOKEN;
+        for (Vessel vessel : context.getEntities().listVesselEntities()) {
+            vessel.setMovePhase(null);
         }
     }
 }

@@ -3,11 +3,16 @@ package com.benberi.cadesim.game.entity.vessel;
 import com.badlogic.gdx.math.Vector2;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.game.entity.Entity;
+import com.benberi.cadesim.game.entity.projectile.CannonBall;
+import com.benberi.cadesim.game.entity.vessel.move.MoveAnimationStructure;
+import com.benberi.cadesim.game.entity.vessel.move.MovePhase;
 import com.benberi.cadesim.game.entity.vessel.move.MoveType;
 import com.benberi.cadesim.game.entity.vessel.move.VesselMoveTurn;
 import com.benberi.cadesim.util.OrientationLocation;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 /**
@@ -15,27 +20,10 @@ import java.util.Queue;
  */
 public abstract class Vessel extends Entity {
 
-    public static final int ROTATION_TICK_DELAY = 200;
-
     /**
      * The name of this vessel player
      */
     private String name;
-
-    /**
-     * The damage of this vessel
-     */
-    private double damage;
-
-    /**
-     * The maximum bilge
-     */
-    private int bilge;
-
-    /**
-     * The amount of filled cannons
-     */
-    private int filledCannons;
 
     /**
      * If the vessel is moving
@@ -63,16 +51,27 @@ public abstract class Vessel extends Entity {
     private VesselMovementAnimation currentPerformingMove;
 
     /**
+     * The turn animation structure
+     */
+    private MoveAnimationStructure structure = new MoveAnimationStructure();
+
+    /**
      * The current turn
      */
     private VesselMoveTurn turn;
 
     /**
-     * If the vessel is performing shoot
+     * The last finished phase
      */
-    private boolean isPerformingShoot;
+    private MovePhase finishedPhase;
 
-    private Queue<VesselMovementAnimation> animations = new LinkedList<VesselMovementAnimation>();
+    private boolean performingLeftShoot;
+    private boolean performingRightShoot;
+
+    /**
+     * The cannon balls that were shoot
+     */
+    private List<CannonBall> cannonballs = new ArrayList<CannonBall>();
 
     public Vessel(GameContext context, String name, int x, int y, int face) {
         super(context);
@@ -82,15 +81,23 @@ public abstract class Vessel extends Entity {
         turn = new VesselMoveTurn();
     }
 
+    public void setMovePhase(MovePhase phase) {
+        this.finishedPhase = phase;
+    }
+
+    public MovePhase getMovePhase() {
+        return finishedPhase;
+    }
+
+    public MoveAnimationStructure getStructure() {
+        return structure;
+    }
+
     /**
      * Starts to perform a given move
      * @param move The move to perform
      */
     public void performMove(VesselMovementAnimation move) {
-        if (move == VesselMovementAnimation.NO_ANIMATION) {
-            animations.poll();
-            return;
-        }
         Vector2 start = new Vector2(this.getX(), this.getY());
         Vector2 currentAnimationLocation = start.cpy();
         this.currentPerformingMove = move;
@@ -111,16 +118,9 @@ public abstract class Vessel extends Entity {
         setMoving(true);
     }
 
-    public Queue<VesselMovementAnimation> getAnimationsQueue() {
-        return animations;
-    }
 
     public String getName() {
         return this.name;
-    }
-
-    public VesselMoveTurn getTurn() {
-        return this.turn;
     }
 
     /**
@@ -145,45 +145,12 @@ public abstract class Vessel extends Entity {
     public int getRotationTargetIndex() {
         return this.rotationTargetIndex;
     }
-
-    /**
-     * Gets the damage of the ship
-     * @return The damage of the hip {@link #damage}
-     */
-    public double getDamage() {
-        return damage;
-    }
-
-    /**
-     * Gets the bilge of the ship
-     * @return {@link #bilge}
-     */
-    public int getBilge() {
-        return bilge;
-    }
-
-    /**
-     * Gets the amount of filled cannons in the ship
-     * @return {@link #filledCannons}
-     */
-    public int getFilledCannons() {
-        return filledCannons;
-    }
-
     /**
      * If the ship currently performing move animation or not
      * @param flag If moving or not
      */
     public void setMoving(boolean flag) {
         this.isMoving = flag;
-    }
-
-    public boolean isPerformingShoot() {
-        return this.isPerformingShoot;
-    }
-
-    public void setPerformingShoot(boolean flag) {
-        this.isPerformingShoot = flag;
     }
 
     /**
@@ -249,23 +216,62 @@ public abstract class Vessel extends Entity {
         }
     }
 
-    /**
-     * Maximum amount of damage to sink
-     */
-    public abstract float getMaxDamage();
-
-    /**
-     * Maximum amount of bilge
-     */
-    public abstract int getMaxBilge();
+    private Vector2 getClosestLeftCannonCollide() {
+        switch (rotationIndex) {
+            case 2:
+                break;
+            case 6:
+                for (int i = 1; i < 4; i++) {
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX() + i, getY());
+                    if (vessel != null) {
+                        return new Vector2(getX() + i, getY());
+                    }
+                }
+                return new Vector2(getX() + 3, getY());
+            case 10:
+                break;
+            case 14:
+                for (int i = 1; i < 4; i++) {
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX() - i, getY());
+                    if (vessel != null) {
+                        return new Vector2(getX() - i, getY());
+                    }
+                }
+                return new Vector2(getX() - 3, getY());
+        }
+        return null;
+    }
 
     /**
      * Maximum amount of cannons
      */
     public abstract int getMaxCannons();
 
-    public void performShoot() {
+    public abstract CannonBall createCannon(GameContext ctx, Vessel source, Vector2 target);
 
-        //getContext().getProjectileManager().fireProjectile(this, );
+    public List<CannonBall> getCannonballs() {
+        return this.cannonballs;
+    }
+
+    public void performLeftShoot(int leftShoots) {
+        if (leftShoots == 1) {
+            Vector2 target = getClosestLeftCannonCollide();
+            CannonBall ball = createCannon(getContext(), this, target);
+            cannonballs.add(ball);
+        }
+        else if (leftShoots == 2) {
+            Vector2 target = getClosestLeftCannonCollide();
+
+            CannonBall ball1 = createCannon(getContext(), this, target);
+            cannonballs.add(ball1);
+
+            CannonBall ball2 = createCannon(getContext(), this, target);
+            ball2.setDelay(150);
+            cannonballs.add(ball2);
+        }
+    }
+
+    public void performRightShoot(int leftShoots) {
+
     }
 }

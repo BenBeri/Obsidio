@@ -5,6 +5,7 @@ import com.benberi.cadesim.client.codec.util.Packet;
 import com.benberi.cadesim.client.packet.ClientPacketExecutor;
 import com.benberi.cadesim.game.entity.vessel.Vessel;
 import com.benberi.cadesim.game.entity.vessel.VesselMovementAnimation;
+import com.benberi.cadesim.game.entity.vessel.move.MoveAnimationTurn;
 
 public class TurnAnimationPacket extends ClientPacketExecutor {
 
@@ -23,13 +24,23 @@ public class TurnAnimationPacket extends ClientPacketExecutor {
 
             Vessel vessel = getContext().getEntities().getVesselByName(name);
             if (vessel != null) {
-                for (int j = 0; j < 4; j++) {
-                    VesselMovementAnimation anim = VesselMovementAnimation.forId(p.readByte());
-                    vessel.getAnimationsQueue().add(anim);
+                for (int slot = 0; slot < 4; slot++) {
+                    MoveAnimationTurn turn = vessel.getStructure().getTurn(slot);
+                    turn.setAnimation(VesselMovementAnimation.forId(p.readByte()));
+                    turn.setSubAnimation(VesselMovementAnimation.forId(p.readByte()));
+                    turn.setLeftShoots(p.readByte());
+                    turn.setRightShoots(p.readByte());
                 }
+
+                System.out.println(name + ": " + vessel.getStructure().toString());
             }
+            else {
+                p.getBuffer().readerIndex(p.getBuffer().readerIndex() + 4);
+            }
+
         }
 
+        getContext().getBattleScene().setTurnExecute();
         getContext().getControlScene().getBnavComponent().resetMoves();
     }
 

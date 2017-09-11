@@ -19,6 +19,7 @@ public class TextureCollection {
      */
     private Map<String, Texture> vessels = new HashMap<String, Texture>();
 
+    private Map<String, Texture> misc = new HashMap<String, Texture>();
 
     private GameContext context;
 
@@ -32,7 +33,7 @@ public class TextureCollection {
     public void create() {
         createSeaTiles();
         createVessels();
-
+        createMisc();
     }
 
     /**
@@ -54,6 +55,15 @@ public class TextureCollection {
     }
 
     /**
+     * Gets misc spritesheet texture
+     * @param index The index
+     * @return A misc texture
+     */
+    public Texture getMisc(String index) {
+        return misc.get(index);
+    }
+
+    /**
      * Creates vessel textures
      */
     private void createVessels() {
@@ -66,5 +76,9 @@ public class TextureCollection {
     private void createSeaTiles() {
         seaTiles.put("cell", new Texture("core/assets/sea/cell.png"));
         seaTiles.put("safe", new Texture("core/assets/sea/safezone.png"));
+    }
+
+    private void createMisc() {
+        misc.put("large_ball", new Texture("core/assets/projectile/cannonball_large.png"));
     }
 }
