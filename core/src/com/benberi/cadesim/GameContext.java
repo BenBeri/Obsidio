@@ -10,6 +10,7 @@ import com.benberi.cadesim.client.packet.OutgoingPacket;
 import com.benberi.cadesim.client.packet.in.LoginResponsePacket;
 import com.benberi.cadesim.client.packet.out.LoginPacket;
 import com.benberi.cadesim.client.packet.out.ManuaverSlotChanged;
+import com.benberi.cadesim.client.packet.out.PlaceCannonPacket;
 import com.benberi.cadesim.client.packet.out.PlaceMovePacket;
 import com.benberi.cadesim.game.entity.EntityManager;
 import com.benberi.cadesim.game.entity.vessel.move.MoveType;
@@ -297,6 +298,13 @@ public class GameContext {
     public void sendManuaverSlotChanged(int manuaverSlot) {
         ManuaverSlotChanged packet = new ManuaverSlotChanged();
         packet.setSlot(manuaverSlot);
+        sendPacket(packet);
+    }
+
+    public void sendAddCannon(int side, int slot) {
+        PlaceCannonPacket packet = new PlaceCannonPacket();
+        packet.setSide(side);
+        packet.setSlot(slot);
         sendPacket(packet);
     }
 }

@@ -123,7 +123,17 @@ public class CannonBall extends Sprite {
                 }
             }
         } else if (source.getY() != target.y) {
-            setY(getY() + (VELOCITY * Gdx.graphics.getDeltaTime()));
+            if (source.getY() > target.y) {
+                setY(getY() - (VELOCITY * Gdx.graphics.getDeltaTime()) );
+                if (getY() <= target.y) {
+                    reached = true;
+                }
+            } else {
+                setY(getY() + (VELOCITY * Gdx.graphics.getDeltaTime()));
+                if (getY() >= target.y) {
+                    reached = true;
+                }
+            }
         }
     }
 }

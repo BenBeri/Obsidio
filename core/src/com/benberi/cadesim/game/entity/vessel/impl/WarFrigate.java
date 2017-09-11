@@ -12,8 +12,8 @@ import com.benberi.cadesim.util.PackedShipOrientation;
 
 public class WarFrigate extends Vessel {
 
-    public WarFrigate(GameContext context, String name, int x, int y, int face) {
-        super(context, name, x, y, face);
+    public WarFrigate(GameContext context, String name, int x, int y) {
+        super(context, name, x, y);
     }
 
     @Override

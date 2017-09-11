@@ -86,5 +86,6 @@ public class ClientPacketHandler {
         packets.put(7, new TurnAnimationPacket(context));
         packets.put(8, new SetPlayersPacket(context));
         packets.put(9, new MovesBarUpdate(context));
+        packets.put(10, new CannonSlotPlacedPacket(context));
     }
 }

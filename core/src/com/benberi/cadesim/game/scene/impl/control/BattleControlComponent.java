@@ -258,6 +258,34 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
                 handleMovePlace(3, button);
             }
         }
+        else if (isPlacingLeftCannons(x, y)) {
+            if (y >= 548 && y <= 562) {
+                getContext().sendAddCannon(0, 0);
+            }
+            else if (y >= 582 && y <= 597) {
+                getContext().sendAddCannon(0, 1);
+            }
+            else if (y >= 618 && y <= 630) {
+                getContext().sendAddCannon(0, 2);
+            }
+            else if (y >= 650 && y <= 665) {
+                getContext().sendAddCannon(0, 3);
+            }
+        }
+        else if (isPlacingRightCannons(x, y)) {
+            if (y >= 548 && y <= 562) {
+                getContext().sendAddCannon(1, 0);
+            }
+            else if (y >= 582 && y <= 597) {
+                getContext().sendAddCannon(1, 1);
+            }
+            else if (y >= 618 && y <= 630) {
+                getContext().sendAddCannon(1, 2);
+            }
+            else if (y >= 650 && y <= 665) {
+                getContext().sendAddCannon(1, 3);
+            }
+        }
         else if (isChosedLeft(x, y)) {
             this.targetMove = MoveType.LEFT;
         }
@@ -267,7 +295,20 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
         else if (isChosedRight(x, y)) {
             this.targetMove = MoveType.RIGHT;
         }
+
         return false;
+    }
+
+    private void handleLeftCannonPlace(float x, float y) {
+
+    }
+
+    private boolean isPlacingLeftCannons(float x, float y) {
+        return x >= 181 && x <= 206;
+    }
+
+    private boolean isPlacingRightCannons(float x, float y) {
+        return x >= 241 && x <= 271;
     }
 
     private int getSlotForPosition(float x, float y) {
@@ -493,12 +534,27 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
         for (int i = 0; i < movesHolder.length; i++) {
             HandMove move = movesHolder[i];
 
-            batch.draw(emptyCannonLeft, controlBackground.getWidth() - shiphand.getWidth() - 81, height);
-            batch.draw(emptyCannonRight, controlBackground.getWidth() - shiphand.getWidth() - 35, height);
+            boolean[] left = move.getLeft();
+            boolean[] right = move.getRight();
+
+            batch.draw(emptyCannonLeft, controlBackground.getWidth() - shiphand.getWidth() - 81, height); // left
+            if (left[0]) {
+                batch.draw(cannonLeft, controlBackground.getWidth() - shiphand.getWidth() - 81, height); // left
+            }
+            batch.draw(emptyCannonRight, controlBackground.getWidth() - shiphand.getWidth() - 35, height); // right
+            if (right[0]) {
+                batch.draw(cannonRight, controlBackground.getWidth() - shiphand.getWidth() - 35, height); // left
+            }
 
             if (movesHolder instanceof BigShipHandMove[]) {
-                batch.draw(emptyCannonLeft, controlBackground.getWidth() - shiphand.getWidth() - 96, height);
-                batch.draw(emptyCannonRight, controlBackground.getWidth() - shiphand.getWidth() - 20, height);
+                batch.draw(emptyCannonLeft, controlBackground.getWidth() - shiphand.getWidth() - 96, height); // left
+                if (left[0] && left[1]) {
+                    batch.draw(cannonLeft, controlBackground.getWidth() - shiphand.getWidth() - 96, height); // left
+                }
+                batch.draw(emptyCannonRight, controlBackground.getWidth() - shiphand.getWidth() - 20, height); // right
+                if (right[0] && right[1]) {
+                    batch.draw(cannonRight, controlBackground.getWidth() - shiphand.getWidth() - 20, height); // right
+                }
             }
 
             if (i == manuaverSlot) {
@@ -649,6 +705,20 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
     public void resetMoves() {
         for (int i = 0; i < movesHolder.length; i++) {
             movesHolder[i].setMove(MoveType.NONE);
+        }
+    }
+
+    public void setCannons(int side, int slot, int amount) {
+        System.out.println("HERE! " + side + " " + slot + " " + amount);
+        if (side == 0) {
+            movesHolder[slot].resetLeft();
+            for (int i = 0; i < amount; i++)
+                movesHolder[slot].addLeft();
+        }
+        else if (side == 1) {
+            movesHolder[slot].resetRight();
+            for (int i = 0; i < amount; i++)
+                movesHolder[slot].addRight();
         }
     }
 }

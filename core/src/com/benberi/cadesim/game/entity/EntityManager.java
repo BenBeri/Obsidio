@@ -26,8 +26,9 @@ public class EntityManager {
      * Adds an entity
      */
     public void addEntity(String name, int x, int y, int face) {
-        WarFrigate wf = new WarFrigate(context, name, x, y, face);
+        WarFrigate wf = new WarFrigate(context, name, x, y);
         wf.create();
+        wf.setRotationIndex(face);
         entities.add(wf);
     }
 
