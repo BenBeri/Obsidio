@@ -3,7 +3,6 @@ package com.benberi.cadesim.game.scene;
 import com.badlogic.gdx.graphics.Texture;
 import com.benberi.cadesim.GameContext;
 
-import javax.xml.soap.Text;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,5 +79,8 @@ public class TextureCollection {
 
     private void createMisc() {
         misc.put("large_ball", new Texture("core/assets/projectile/cannonball_large.png"));
+        misc.put("large_splash", new Texture("core/assets/effects/splash_big.png"));
+        misc.put("explode_big", new Texture("core/assets/effects/explode_big.png"));
+        misc.put("hit", new Texture("core/assets/effects/hit.png"));
     }
 }

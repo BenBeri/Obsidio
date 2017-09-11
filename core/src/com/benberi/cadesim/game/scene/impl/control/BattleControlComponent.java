@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.benberi.cadesim.Constants;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.game.entity.vessel.move.MoveType;
@@ -125,7 +126,12 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
     private Texture autoOn;
     private Texture autoOff;
 
+    private int manuaverSlot = 3;
+
     private boolean isBigShip;
+
+    private boolean isDragging;
+    private Vector2 draggingPosition;
 
     protected BattleControlComponent(GameContext context, ControlAreaScene owner, boolean big) {
         super(context, owner);
@@ -234,6 +240,7 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
         renderMoveControl();
     }
 
+
     @Override
     public boolean handleClick(float x, float y, int button) {
         System.out.println(x + " " + y);
@@ -263,7 +270,55 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
         return false;
     }
 
+    private int getSlotForPosition(float x, float y) {
+        if (y >= 538 && y <= 569) {
+            return 0;
+        }
+        else if (y >= 573 && y <= 603) {
+           return 1;
+        }
+        else if (y >= 606 && y <= 637) {
+            return 2;
+        }
+        else if(y >= 642 && y <= 670) {
+           return 3;
+        }
+        return -1;
+    }
+
+    @Override
+    public boolean handleDrag(float x, float y, float ix, float iy) {
+        if (!isDragging) {
+            if (getSlotForPosition(x, y) == manuaverSlot) {
+                isDragging = true;
+            }
+        }
+
+        if (isDragging) {
+            draggingPosition = new Vector2(x, y);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean handleRelease(float x, float y, int button) {
+        if (isDragging) {
+            isDragging = false;
+            int slot = getSlotForPosition(x, y);
+            if (slot != -1) {
+                manuaverSlot = slot;
+                getContext().sendManuaverSlotChanged(manuaverSlot);
+            }
+
+            draggingPosition = null;
+        }
+        return false;
+    }
+
     private void handleMovePlace(int position, int button) {
+        if (position == manuaverSlot) {
+            return;
+        }
         HandMove move = movesHolder[position];
         if (move.getMove() == MoveType.NONE) {
             if (button == Input.Buttons.LEFT) {
@@ -423,8 +478,10 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
         drawShipStatus();
         drawTimer();
         drawMovesSelect();
-
         batch.draw(title, 65, 140);
+        if (isDragging) {
+            batch.draw(manuaverTexture, draggingPosition.x - manuaverTexture.getRegionWidth() / 2, Gdx.graphics.getHeight() - draggingPosition.y - manuaverTexture.getRegionHeight() / 2);
+        }
         batch.end();
     }
 
@@ -444,8 +501,13 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
                 batch.draw(emptyCannonRight, controlBackground.getWidth() - shiphand.getWidth() - 20, height);
             }
 
-            if (move.getMove() != MoveType.NONE) {
-                batch.draw(getTextureForMove(move.getMove()), controlBackground.getWidth() - shiphand.getWidth() - 64, height - 4);
+            if (i == manuaverSlot) {
+                batch.draw(manuaverTexture, controlBackground.getWidth() - shiphand.getWidth() - 64, height - 4);
+            }
+            else {
+                if (move.getMove() != MoveType.NONE) {
+                    batch.draw(getTextureForMove(move.getMove()), controlBackground.getWidth() - shiphand.getWidth() - 64, height - 4);
+                }
             }
 
             height -= 34;
@@ -565,6 +627,7 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
 
         batch.draw(shipStatus, x, y);
     }
+
 
     public boolean isChosedLeft(float x, float y) {
         return x >= 80 && x <= 107 && y >= 598 && y <= 624;

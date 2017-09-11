@@ -10,14 +10,16 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Bezier;
 import com.badlogic.gdx.math.Vector2;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.game.entity.projectile.CannonBall;
 import com.benberi.cadesim.game.entity.vessel.Vessel;
+import com.benberi.cadesim.game.entity.vessel.VesselMoveType;
 import com.benberi.cadesim.game.entity.vessel.VesselMovementAnimation;
-import com.benberi.cadesim.game.entity.vessel.impl.WarFrigate;
-import com.benberi.cadesim.game.entity.vessel.move.*;
+import com.benberi.cadesim.game.entity.vessel.move.MoveAnimationTurn;
+import com.benberi.cadesim.game.entity.vessel.move.MovePhase;
 import com.benberi.cadesim.game.scene.GameScene;
 import com.benberi.cadesim.game.scene.impl.battle.tile.GameTile;
 
@@ -60,6 +62,7 @@ public class SeaBattleScene implements GameScene {
      */
     private Texture sea;
 
+    private ShapeRenderer renderer;
     /**
      * If the user can drag the map
      */
@@ -94,6 +97,7 @@ public class SeaBattleScene implements GameScene {
         parameter.shadowOffsetY = 1;
         font = generator.generateFont(parameter);
 
+        renderer = new ShapeRenderer();
         this.batch = new SpriteBatch();
         information.create();
         sea = new Texture("core/assets/sea/sea1.png");
@@ -129,11 +133,14 @@ public class SeaBattleScene implements GameScene {
         }
 
         for (Vessel vessel : context.getEntities().listVesselEntities()) {
+            if (vessel.getMoveDelay() != -1) {
+                vessel.tickMoveDelay();
+            }
             if (!vessel.isMoving()) {
                 if (currentSlot != -1) {
                     MoveAnimationTurn turn = vessel.getStructure().getTurn(currentSlot);
                     if (currentPhase == MovePhase.MOVE_TOKEN && vessel.getMovePhase() == null) {
-                        if (turn.getAnimation() != VesselMovementAnimation.NO_ANIMATION) {
+                        if (turn.getAnimation() != VesselMovementAnimation.NO_ANIMATION && vessel.getMoveDelay() == -1) {
                             vessel.performMove(turn.getAnimation());
                             turn.setAnimation(VesselMovementAnimation.NO_ANIMATION);
                         }
@@ -141,7 +148,7 @@ public class SeaBattleScene implements GameScene {
                             vessel.setMovePhase(MovePhase.getNext(vessel.getMovePhase()));
                         }
                     }
-                    else if (currentPhase == MovePhase.ACTION_MOVE && vessel.getMovePhase() == MovePhase.MOVE_TOKEN) {
+                    else if (currentPhase == MovePhase.ACTION_MOVE && vessel.getMovePhase() == MovePhase.MOVE_TOKEN && vessel.getMoveDelay() == -1) {
                         if (turn.getSubAnimation() != VesselMovementAnimation.NO_ANIMATION) {
                             vessel.performMove(turn.getSubAnimation());
                             turn.setSubAnimation(VesselMovementAnimation.NO_ANIMATION);
@@ -150,7 +157,7 @@ public class SeaBattleScene implements GameScene {
                             vessel.setMovePhase(MovePhase.getNext(vessel.getMovePhase()));
                         }
                     }
-                    else if (currentPhase == MovePhase.SHOOT && vessel.getMovePhase() == MovePhase.ACTION_MOVE) {
+                    else if (currentPhase == MovePhase.SHOOT && vessel.getMovePhase() == MovePhase.ACTION_MOVE  && vessel.getMoveDelay() == -1 && vessel.getCannonballs().size() == 0) {
                         if (turn.getLeftShoots() == 0 && turn.getRightShoots() == 0) {
                             vessel.setMovePhase(MovePhase.getNext(vessel.getMovePhase()));
                         }
@@ -164,17 +171,6 @@ public class SeaBattleScene implements GameScene {
                                 turn.setRightShoots(0);
                             }
                         }
-                    }
-                }
-
-                Iterator<CannonBall> itr = vessel.getCannonballs().iterator();
-                while (itr.hasNext()) {
-                    CannonBall c = itr.next();
-                    if (!c.reached()) {
-                        c.move();
-                    }
-                    else {
-                        itr.remove();
                     }
                 }
             }
@@ -219,6 +215,7 @@ public class SeaBattleScene implements GameScene {
                         vessel.setRotationIndex(vessel.getRotationTargetIndex());
 
                     vessel.setMovePhase(MovePhase.getNext(vessel.getMovePhase()));
+                    vessel.setMoveDelay();
                 }
                 else {
                     // process move
@@ -229,6 +226,34 @@ public class SeaBattleScene implements GameScene {
                 // tick rotation of the ship image
                 if (result % 25 == 0) {
                     vessel.tickRotation();
+                }
+            }
+        }
+
+
+        for (Vessel vessel : context.getEntities().listVesselEntities()) {
+            if (vessel.isSmoking()) {
+                vessel.tickSmoke();
+            }
+            Iterator<CannonBall> itr = vessel.getCannonballs().iterator();
+            while (itr.hasNext()) {
+                CannonBall c = itr.next();
+                if (c.isReleased()) {
+                    if (c.hasSubCannon()) {
+                        if (c.canReleaseSubCannon()) {
+                            c.getSubcannon().setReleased(true);
+                        }
+                    }
+                    if (!c.reached()) {
+                        c.move();
+                    } else {
+                        if (c.isFinishedSplashing()) {
+                            itr.remove();
+                        }
+                        else {
+                            c.tickSplash();
+                        }
+                    }
                 }
             }
         }
@@ -289,12 +314,46 @@ public class SeaBattleScene implements GameScene {
             batch.draw(vessel, x + vessel.getOrientationLocation().getOffsetx(), y + vessel.getOrientationLocation().getOffsety());
 
             GlyphLayout layout = new GlyphLayout(font, name);
-            font.draw(batch, name, x + (vessel.getRegionWidth() / 2) - (layout.width / 2), y + vessel.getRegionHeight() * 1.6f);
+            font.draw(batch, name, x + (vessel.getRegionWidth() / 2) - (layout.width / 2), y + vessel.getRegionHeight() * 1.7f);
+            batch.end();
+            int width = vessel.getMoveType().getBarWidth();
+            renderer.setProjectionMatrix(camera.combined);
+            renderer.begin(ShapeRenderer.ShapeType.Line);
+            renderer.setColor(Color.BLACK);
+            renderer.rect(x + (vessel.getRegionWidth() / 2) - (width / 2), Math.round(y + vessel.getRegionHeight() * 1.35f), width, 7);
+            renderer.end();
+            renderer.begin(ShapeRenderer.ShapeType.Filled);
+            renderer.setColor(Color.WHITE);
 
+            int w = (width - 1) / 3;
+            int fill = vessel.getNumberOfMoves() > 3 ? 3 : vessel.getNumberOfMoves();
+
+            renderer.rect(x + (vessel.getRegionWidth() / 2) - (width / 2), Math.round(y + vessel.getRegionHeight() * 1.35f) + 1, fill * w, 6);
+            renderer.setColor(Color.RED);
+            if (vessel.getMoveType() == VesselMoveType.THREE_MOVES && vessel.getNumberOfMoves() > 3) {
+                renderer.rect(x + (vessel.getRegionWidth() / 2) - (width / 2) + (width - 1) - 2, Math.round(y + vessel.getRegionHeight() * 1.35f) + 1, 10, 6);
+            }
+            renderer.end();
+            batch.begin();
             for (CannonBall c : vessel.getCannonballs()) {
                 float cx = getIsometricX(c.getX(), c.getY(), c);
                 float cy = getIsometricY(c.getX(), c.getY(), c);
-                batch.draw(c, cx, cy);
+
+                if (!c.reached()) {
+                    batch.draw(c, cx, cy);
+                }
+                else {
+                    cx = getIsometricX(c.getX(), c.getY(), c.getSplash());
+                    cy = getIsometricY(c.getX(), c.getY(), c.getSplash());
+                    batch.draw(c.getSplash(), cx, cy);
+                }
+            }
+
+            if (vessel.isSmoking()) {
+                TextureRegion r = vessel.getShootSmoke();
+                float cx = getIsometricX(vessel.getX(), vessel.getY(), r);
+                float cy = getIsometricY(vessel.getX(), vessel.getY(), r);
+                batch.draw(r, cx, cy);
             }
         }
     }

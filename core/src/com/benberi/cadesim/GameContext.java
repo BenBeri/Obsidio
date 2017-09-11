@@ -9,6 +9,7 @@ import com.benberi.cadesim.client.packet.ClientPacketHandler;
 import com.benberi.cadesim.client.packet.OutgoingPacket;
 import com.benberi.cadesim.client.packet.in.LoginResponsePacket;
 import com.benberi.cadesim.client.packet.out.LoginPacket;
+import com.benberi.cadesim.client.packet.out.ManuaverSlotChanged;
 import com.benberi.cadesim.client.packet.out.PlaceMovePacket;
 import com.benberi.cadesim.game.entity.EntityManager;
 import com.benberi.cadesim.game.entity.vessel.move.MoveType;
@@ -291,5 +292,11 @@ public class GameContext {
         connected = false;
         connectScene.setup();
         connectScene.setPopup("You have disconnected from the server.");
+    }
+
+    public void sendManuaverSlotChanged(int manuaverSlot) {
+        ManuaverSlotChanged packet = new ManuaverSlotChanged();
+        packet.setSlot(manuaverSlot);
+        sendPacket(packet);
     }
 }

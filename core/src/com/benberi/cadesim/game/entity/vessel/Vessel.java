@@ -1,5 +1,7 @@
 package com.benberi.cadesim.game.entity.vessel;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.game.entity.Entity;
@@ -11,9 +13,7 @@ import com.benberi.cadesim.game.entity.vessel.move.VesselMoveTurn;
 import com.benberi.cadesim.util.OrientationLocation;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 /**
  * Represents a vessel abstraction
@@ -65,13 +65,19 @@ public abstract class Vessel extends Entity {
      */
     private MovePhase finishedPhase;
 
-    private boolean performingLeftShoot;
-    private boolean performingRightShoot;
+    private int numberOfMoves;
+
+    protected TextureRegion shootSmoke;
+
+    private boolean isSmoking;
+
+    private int smokeTicks;
 
     /**
      * The cannon balls that were shoot
      */
     private List<CannonBall> cannonballs = new ArrayList<CannonBall>();
+    private int moveDelay;
 
     public Vessel(GameContext context, String name, int x, int y, int face) {
         super(context);
@@ -91,6 +97,14 @@ public abstract class Vessel extends Entity {
 
     public MoveAnimationStructure getStructure() {
         return structure;
+    }
+
+    public int getNumberOfMoves() {
+        return numberOfMoves;
+    }
+
+    public void setNumberOfMoves(int moves) {
+        this.numberOfMoves = moves;
     }
 
     /**
@@ -121,6 +135,35 @@ public abstract class Vessel extends Entity {
 
     public String getName() {
         return this.name;
+    }
+
+    public boolean isSmoking() {
+        return this.isSmoking;
+    }
+
+    public void tickMoveDelay() {
+        moveDelay -= 100 * Gdx.graphics.getDeltaTime();
+        if (moveDelay <= 0) {
+            moveDelay = -1;
+        }
+    }
+
+    public int getMoveDelay() {
+        return this.moveDelay;
+    }
+
+    public void tickSmoke() {
+        if (smokeTicks >= 5) {
+            shootSmoke.setRegion(shootSmoke.getRegionX() + 40, 0, 40, 30);
+            if (shootSmoke.getRegionX() > shootSmoke.getTexture().getWidth()) {
+                isSmoking = false;
+                shootSmoke.setRegion(0, 0, 40, 30);
+            }
+            smokeTicks = 0;
+        }
+        else {
+            smokeTicks += 100 * Gdx.graphics.getDeltaTime();
+        }
     }
 
     /**
@@ -167,6 +210,10 @@ public abstract class Vessel extends Entity {
      */
     public int getRotationIndex() {
         return this.rotationIndex;
+    }
+
+    public TextureRegion getShootSmoke() {
+        return shootSmoke;
     }
 
     /**
@@ -249,6 +296,8 @@ public abstract class Vessel extends Entity {
 
     public abstract CannonBall createCannon(GameContext ctx, Vessel source, Vector2 target);
 
+    public abstract VesselMoveType getMoveType();
+
     public List<CannonBall> getCannonballs() {
         return this.cannonballs;
     }
@@ -263,15 +312,22 @@ public abstract class Vessel extends Entity {
             Vector2 target = getClosestLeftCannonCollide();
 
             CannonBall ball1 = createCannon(getContext(), this, target);
-            cannonballs.add(ball1);
-
             CannonBall ball2 = createCannon(getContext(), this, target);
-            ball2.setDelay(150);
+            ball2.setReleased(false);
+
+            ball1.setSubcannon(ball2);
+            cannonballs.add(ball1);
             cannonballs.add(ball2);
         }
+
+        isSmoking = true;
     }
 
     public void performRightShoot(int leftShoots) {
 
+    }
+
+    public void setMoveDelay() {
+        this.moveDelay = 70;
     }
 }

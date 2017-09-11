@@ -45,6 +45,9 @@ public class ControlAreaScene implements GameScene {
 
     @Override
     public boolean handleDrag(float sx, float sy, float x, float y) {
+        if (control.handleDrag(sx, sy, x, y)) {
+            return true;
+        }
         return false;
     }
 
@@ -58,6 +61,9 @@ public class ControlAreaScene implements GameScene {
 
     @Override
     public boolean handleClickRelease(float x, float y, int button) {
+        if (control.handleRelease(x, y, button)) {
+            return true;
+        }
         return false;
     }
 

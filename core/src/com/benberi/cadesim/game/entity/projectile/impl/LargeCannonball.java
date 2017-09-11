@@ -8,7 +8,7 @@ import com.benberi.cadesim.game.entity.vessel.Vessel;
 
 public class LargeCannonball extends CannonBall {
 
-    public LargeCannonball(GameContext context, Vessel source, Vector2 target) {
-        super(source, target, context.getTextures().getMisc("large_ball"));
+    public LargeCannonball(GameContext context, Vessel source, Vector2 target, Texture splash) {
+        super(source, target, context.getTextures().getMisc("large_ball"), splash);
     }
 }
