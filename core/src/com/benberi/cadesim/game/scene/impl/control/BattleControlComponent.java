@@ -705,11 +705,12 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
     public void resetMoves() {
         for (int i = 0; i < movesHolder.length; i++) {
             movesHolder[i].setMove(MoveType.NONE);
+            movesHolder[i].resetLeft();
+            movesHolder[i].resetRight();
         }
     }
 
     public void setCannons(int side, int slot, int amount) {
-        System.out.println("HERE! " + side + " " + slot + " " + amount);
         if (side == 0) {
             movesHolder[slot].resetLeft();
             for (int i = 0; i < amount; i++)

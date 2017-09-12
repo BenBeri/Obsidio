@@ -265,78 +265,78 @@ public abstract class Vessel extends Entity {
     private Vector2 getClosestLeftCannonCollide() {
         switch (rotationIndex) {
             case 2:
-//                for (int i = 1; i < 4; i++) {
-//                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX(), getY() + i);
-//                    if (vessel != null) {
-//                        return new Vector2(getX(), getY() + i);
-//                    }
-//                }
+                for (int i = 1; i < 4; i++) {
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX(), getY() + i);
+                    if (vessel != null) {
+                        return new Vector2(getX(), getY() + i);
+                    }
+                }
                 return new Vector2(getX(), getY() + 3);
             case 6:
-//                for (int i = 1; i < 4; i++) {
-//                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX() + i, getY());
-//                    if (vessel != null) {
-//                        return new Vector2(getX() + i, getY());
-//                    }
-//                }
+                for (int i = 1; i < 4; i++) {
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX() + i, getY());
+                    if (vessel != null) {
+                        return new Vector2(getX() + i, getY());
+                    }
+                }
                 return new Vector2(getX() + 3, getY());
             case 10:
-//                for (int i = 1; i < 4; i++) {
-//                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX(), getY() - i);
-//                    if (vessel != null) {
-//                        return new Vector2(getX(), getY() - i);
-//                    }
-//                }
+                for (int i = 1; i < 4; i++) {
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX(), getY() - i);
+                    if (vessel != null) {
+                        return new Vector2(getX(), getY() - i);
+                    }
+                }
                 return new Vector2(getX(), getY() - 3);
             case 14:
-//                for (int i = 1; i < 4; i++) {
-//                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX() - i, getY());
-//                    if (vessel != null) {
-//                        return new Vector2(getX() - i, getY());
-//                    }
-//                }
+                for (int i = 1; i < 4; i++) {
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX() - i, getY());
+                    if (vessel != null) {
+                        return new Vector2(getX() - i, getY());
+                    }
+                }
                 return new Vector2(getX() - 3, getY());
         }
-        return null;
+        return new Vector2(getX(), getY());
     }
 
 
     public Vector2 getClosestRightCannonCollide() {
         switch (rotationIndex) {
             case 2:
-//                for (int i = 1; i < 4; i++) {
-//                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX(), getY() - i);
-//                    if (vessel != null) {
-//                        return new Vector2(getX(), getY() - i);
-//                    }
-//                }
+                for (int i = 1; i < 4; i++) {
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX(), getY() - i);
+                    if (vessel != null) {
+                        return new Vector2(getX(), getY() - i);
+                    }
+                }
                 return new Vector2(getX(), getY() - 3);
             case 6:
-//                for (int i = 1; i < 4; i++) {
-//                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX() - i, getY());
-//                    if (vessel != null) {
-//                        return new Vector2(getX() - i, getY());
-//                    }
-//                }
+                for (int i = 1; i < 4; i++) {
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX() - i, getY());
+                    if (vessel != null) {
+                        return new Vector2(getX() - i, getY());
+                    }
+                }
                 return new Vector2(getX() - 3, getY());
             case 10:
-//                for (int i = 1; i < 4; i++) {
-//                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX(), getY() + i);
-//                    if (vessel != null) {
-//                        return new Vector2(getX(), getY() + i);
-//                    }
-//                }
+                for (int i = 1; i < 4; i++) {
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX(), getY() + i);
+                    if (vessel != null) {
+                        return new Vector2(getX(), getY() + i);
+                    }
+                }
                 return new Vector2(getX(), getY() + 3);
             case 14:
-//                for (int i = 1; i < 4; i++) {
-//                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX() + i, getY());
-//                    if (vessel != null) {
-//                        return new Vector2(getX() + i, getY());
-//                    }
-//                }
+                for (int i = 1; i < 4; i++) {
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX() + i, getY());
+                    if (vessel != null) {
+                        return new Vector2(getX() + i, getY());
+                    }
+                }
                 return new Vector2(getX() + 3, getY());
         }
-        return null;
+        return new Vector2(getX(), getY());
     }
 
     /**
@@ -356,6 +356,9 @@ public abstract class Vessel extends Entity {
         if (leftShoots == 1) {
             Vector2 target = getClosestLeftCannonCollide();
             CannonBall ball = createCannon(getContext(), this, target);
+            if (getContext().getEntities().getVesselByPosition(target.x, target.y) != null) {
+                ball.setExplodeOnReach(true);
+            }
             cannonballs.add(ball);
         }
         else if (leftShoots == 2) {
@@ -363,6 +366,11 @@ public abstract class Vessel extends Entity {
 
             CannonBall ball1 = createCannon(getContext(), this, target);
             CannonBall ball2 = createCannon(getContext(), this, target);
+
+            if (getContext().getEntities().getVesselByPosition(target.x, target.y) != null) {
+                ball1.setExplodeOnReach(true);
+                ball2.setExplodeOnReach(true);
+            }
             ball2.setReleased(false);
 
             ball1.setSubcannon(ball2);
@@ -378,6 +386,9 @@ public abstract class Vessel extends Entity {
         if (rightShoots == 1) {
             Vector2 target = getClosestLeftCannonCollide();
             CannonBall ball = createCannon(getContext(), this, target);
+            if (getContext().getEntities().getVesselByPosition(target.x, target.y) != null) {
+                ball.setExplodeOnReach(true);
+            }
             cannonballs.add(ball);
         }
         else if (rightShoots == 2) {
@@ -385,6 +396,10 @@ public abstract class Vessel extends Entity {
 
             CannonBall ball1 = createCannon(getContext(), this, target);
             CannonBall ball2 = createCannon(getContext(), this, target);
+            if (getContext().getEntities().getVesselByPosition(target.x, target.y) != null) {
+                ball1.setExplodeOnReach(true);
+                ball2.setExplodeOnReach(true);
+            }
             ball2.setReleased(false);
 
             ball1.setSubcannon(ball2);

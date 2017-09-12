@@ -31,6 +31,7 @@ public class VesselAnimationVector {
      */
     private Vector2 end;
 
+    private int animationTicks;
 
     /**
      * The current animation location
@@ -54,6 +55,18 @@ public class VesselAnimationVector {
 
     public void addStep(double step) {
         this.currentStep += step;
+    }
+
+    public void resetAnimationTicks() {
+        this.animationTicks = 0;
+    }
+
+    public int getAnimationTicks() {
+        return this.animationTicks;
+    }
+
+    public void tickAnimationTicks(float amm) {
+        animationTicks += amm;
     }
 
     /**

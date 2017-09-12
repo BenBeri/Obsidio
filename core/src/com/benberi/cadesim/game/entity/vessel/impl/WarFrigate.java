@@ -38,7 +38,8 @@ public class WarFrigate extends Vessel {
 
     @Override
     public CannonBall createCannon(GameContext ctx, Vessel source, Vector2 target) {
-        return new LargeCannonball(ctx, source, target, getContext().getTextures().getMisc("large_splash"));
+        return new LargeCannonball(ctx, source, target, getContext().getTextures().getMisc("large_splash"),
+                getContext().getTextures().getMisc("hit"));
     }
 
     @Override

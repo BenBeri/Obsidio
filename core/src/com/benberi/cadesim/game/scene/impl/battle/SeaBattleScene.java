@@ -24,6 +24,7 @@ import com.benberi.cadesim.game.scene.GameScene;
 import com.benberi.cadesim.game.scene.impl.battle.tile.GameTile;
 
 import java.util.Iterator;
+import java.util.List;
 
 public class SeaBattleScene implements GameScene {
 
@@ -55,8 +56,6 @@ public class SeaBattleScene implements GameScene {
      */
     private OrthographicCamera camera;
 
-    private Vessel ship;
-
     /**
      * The sea texture
      */
@@ -71,8 +70,6 @@ public class SeaBattleScene implements GameScene {
     private GameInformation information;
 
     private BitmapFont font;
-
-    private long lastMove;
 
     private int currentSlot = -1;
     private MovePhase currentPhase;
@@ -184,6 +181,11 @@ public class SeaBattleScene implements GameScene {
 
                 // calculate step based on progress towards target (0 -> 1)
                 // float step = 1 - (ship.getEndPoint().dst(ship.getLinearVector()) / ship.getDistanceToEndPoint());
+
+
+                float velocityTurns = (0.011f * Gdx.graphics.getDeltaTime()) * 100; //Gdx.graphics.getDeltaTime();
+                float velocityForward = (0.015f * Gdx.graphics.getDeltaTime()) * 100; //Gdx.graphics.getDeltaTime();
+
                 if (move != VesselMovementAnimation.MOVE_FORWARD) {
                     vessel.getAnimation().addStep(velocityTurns);
                     // step on curve (0 -> 1), first bezier point, second bezier point, third bezier point, temporary vector for calculations
@@ -195,15 +197,20 @@ public class SeaBattleScene implements GameScene {
                     int add = move.getIncrementXForRotation(vessel.getRotationIndex());
                     if (add == -1 || add == 1) {
                         current.x += (velocityForward * (float) add);
+                        //current.x += (velocityForward * (float) add);
                     }
                     else {
                         add = move.getIncrementYForRotation(vessel.getRotationIndex());
+                       // current.y += (velocityForward * (float) add);
                         current.y += (velocityForward * (float) add);
                     }
+                   /// vessel.getAnimation().addStep(velocityForward);
                     vessel.getAnimation().addStep(velocityForward);
                 }
 
                 int result = (int) (vessel.getAnimation().getCurrentStep() * 100);
+                vessel.getAnimation().tickAnimationTicks(velocityTurns * 100);
+                //System.out.println(result);
 
                 // check if the step is reached to the end, and dispose the movement
                 if (result >= 100) {
@@ -223,9 +230,12 @@ public class SeaBattleScene implements GameScene {
                     vessel.setY(current.y);
                 }
 
+                System.out.println(vessel.getAnimation().getAnimationTicks());
+
                 // tick rotation of the ship image
-                if (result % 25 == 0) {
+                if (vessel.getAnimation().getAnimationTicks() >= 14) {
                     vessel.tickRotation();
+                    vessel.getAnimation().resetAnimationTicks();
                 }
             }
         }
@@ -247,11 +257,11 @@ public class SeaBattleScene implements GameScene {
                     if (!c.reached()) {
                         c.move();
                     } else {
-                        if (c.isFinishedSplashing()) {
+                        if (c.finnishedEndingAnimation()) {
                             itr.remove();
                         }
                         else {
-                            c.tickSplash();
+                            c.tickEndingAnimation();
                         }
                     }
                 }
@@ -297,10 +307,12 @@ public class SeaBattleScene implements GameScene {
      */
     private void renderEntities() {
 
+        List<Vessel> sortedVessels = context.getEntities().listVesselEntities();
+
         /*
          * Render vessels
          */
-        for (Vessel vessel : context.getEntities().listVesselEntities()) {
+        for (Vessel vessel : context.getEntities().listCoordinateSortedVessels()) {
 
             // X position of the vessel
             float x = getIsometricX(vessel.getX(), vessel.getY(), vessel);
@@ -308,17 +320,51 @@ public class SeaBattleScene implements GameScene {
             // Y position of the vessel
             float y = getIsometricY(vessel.getX(), vessel.getY(), vessel);
 
-            String name = vessel.getName();
-
             // draw vessel
             batch.draw(vessel, x + vessel.getOrientationLocation().getOffsetx(), y + vessel.getOrientationLocation().getOffsety());
+        }
 
-            GlyphLayout layout = new GlyphLayout(font, name);
-            font.draw(batch, name, x + (vessel.getRegionWidth() / 2) - (layout.width / 2), y + vessel.getRegionHeight() * 1.7f);
-            batch.end();
-            int width = vessel.getMoveType().getBarWidth();
-            renderer.setProjectionMatrix(camera.combined);
+        /*
+         * Render cannon balls
+         */
+        for (Vessel vessel : sortedVessels) {
+            for (CannonBall c : vessel.getCannonballs()) {
+                float cx = getIsometricX(c.getX(), c.getY(), c);
+                float cy = getIsometricY(c.getX(), c.getY(), c);
+
+                if (!c.reached()) {
+                    batch.draw(c, cx, cy);
+                }
+                else {
+                    cx = getIsometricX(c.getX(), c.getY(), c.getEndingAnimationRegion());
+                    cy = getIsometricY(c.getX(), c.getY(), c.getEndingAnimationRegion());
+                    batch.draw(c.getEndingAnimationRegion(), cx, cy);
+                }
+            }
+
+            if (vessel.isSmoking()) {
+                TextureRegion r = vessel.getShootSmoke();
+                float cx = getIsometricX(vessel.getX(), vessel.getY(), r);
+                float cy = getIsometricY(vessel.getX(), vessel.getY(), r);
+                batch.draw(r, cx, cy);
+            }
+        }
+
+        batch.end();
+        renderer.setProjectionMatrix(camera.combined);
+
+        /*
+         * Render name & moves bar
+         */
+        for (Vessel vessel : sortedVessels) {
             renderer.begin(ShapeRenderer.ShapeType.Line);
+            // X position of the vessel
+            float x = getIsometricX(vessel.getX(), vessel.getY(), vessel);
+
+            // Y position of the vessel
+            float y = getIsometricY(vessel.getX(), vessel.getY(), vessel);
+
+            int width = vessel.getMoveType().getBarWidth();
             renderer.setColor(Color.BLACK);
             renderer.rect(x + (vessel.getRegionWidth() / 2) - (width / 2), Math.round(y + vessel.getRegionHeight() * 1.35f), width, 7);
             renderer.end();
@@ -334,28 +380,14 @@ public class SeaBattleScene implements GameScene {
                 renderer.rect(x + (vessel.getRegionWidth() / 2) - (width / 2) + (width - 1) - 2, Math.round(y + vessel.getRegionHeight() * 1.35f) + 1, 10, 6);
             }
             renderer.end();
+
             batch.begin();
-            for (CannonBall c : vessel.getCannonballs()) {
-                float cx = getIsometricX(c.getX(), c.getY(), c);
-                float cy = getIsometricY(c.getX(), c.getY(), c);
-
-                if (!c.reached()) {
-                    batch.draw(c, cx, cy);
-                }
-                else {
-                    cx = getIsometricX(c.getX(), c.getY(), c.getSplash());
-                    cy = getIsometricY(c.getX(), c.getY(), c.getSplash());
-                    batch.draw(c.getSplash(), cx, cy);
-                }
-            }
-
-            if (vessel.isSmoking()) {
-                TextureRegion r = vessel.getShootSmoke();
-                float cx = getIsometricX(vessel.getX(), vessel.getY(), r);
-                float cy = getIsometricY(vessel.getX(), vessel.getY(), r);
-                batch.draw(r, cx, cy);
-            }
+            GlyphLayout layout = new GlyphLayout(font, vessel.getName());
+            font.draw(batch, vessel.getName(), x + (vessel.getRegionWidth() / 2) - (layout.width / 2), y + vessel.getRegionHeight() * 1.7f);
+            batch.end();
         }
+
+        batch.begin();
     }
 
 

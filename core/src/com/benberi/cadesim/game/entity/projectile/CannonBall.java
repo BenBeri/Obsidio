@@ -31,7 +31,10 @@ public class CannonBall extends Sprite {
      */
     private boolean released = true;
 
-    private TextureRegion splash;
+    private TextureRegion ending;
+
+    private Texture splash;
+    private Texture hit;
 
     /**
      * When a vessel shoots two cannons, the second cannon will be contained in the first cannon, so it can
@@ -42,27 +45,32 @@ public class CannonBall extends Sprite {
     private int splashTicks;
 
     private int regX;
+    private boolean explodeOnReach;
 
-    protected CannonBall(Vessel source, Vector2 target, Texture t, Texture splash) {
+    protected CannonBall(Vessel source, Vector2 target, Texture t, Texture splash, Texture hit) {
         super(t);
         this.source = source;
         this.target = target;
         setPosition(source.getX(), source.getY());
-        this.splash = new TextureRegion(splash);
-        this.splash.setRegionWidth(40);
-        this.splash.setRegionHeight(30);
-        this.splash.setRegionX(0);
-        this.splash.setRegionY(0);
+
+        this.hit = hit;
+        this.splash = splash;
+
+        this.ending = new TextureRegion(splash);
+        this.ending.setRegionWidth(40);
+        this.ending.setRegionHeight(30);
+        this.ending.setRegionX(0);
+        this.ending.setRegionY(0);
     }
 
-    public boolean isFinishedSplashing() {
-        return splash.getRegionX() >= splash.getTexture().getWidth();
+    public boolean finnishedEndingAnimation() {
+        return ending.getRegionX() >= ending.getTexture().getWidth();
     }
 
-    public void tickSplash() {
+    public void tickEndingAnimation() {
         if (splashTicks >= 2) {
-            splash.setRegion(regX, 0, 40, 30);
-            System.out.println(splash.getRegionX());
+            ending.setRegion(regX, 0, 40, 30);
+            System.out.println(ending.getRegionX());
             regX += 40;
             splashTicks = 0;
         }
@@ -75,8 +83,8 @@ public class CannonBall extends Sprite {
         this.subcannon = c;
     }
 
-    public TextureRegion getSplash() {
-        return splash;
+    public TextureRegion getEndingAnimationRegion() {
+        return ending;
     }
 
     public CannonBall getSubcannon() {
@@ -134,6 +142,17 @@ public class CannonBall extends Sprite {
                     reached = true;
                 }
             }
+        }
+    }
+
+    public void setExplodeOnReach(boolean explodeOnReach) {
+        this.explodeOnReach = explodeOnReach;
+        if (explodeOnReach) {
+            this.ending = new TextureRegion(hit);
+            this.ending.setRegionWidth(40);
+            this.ending.setRegionHeight(30);
+            this.ending.setRegionX(0);
+            this.ending.setRegionY(0);
         }
     }
 }
