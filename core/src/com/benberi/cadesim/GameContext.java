@@ -8,10 +8,7 @@ import com.benberi.cadesim.client.codec.util.Packet;
 import com.benberi.cadesim.client.packet.ClientPacketHandler;
 import com.benberi.cadesim.client.packet.OutgoingPacket;
 import com.benberi.cadesim.client.packet.in.LoginResponsePacket;
-import com.benberi.cadesim.client.packet.out.LoginPacket;
-import com.benberi.cadesim.client.packet.out.ManuaverSlotChanged;
-import com.benberi.cadesim.client.packet.out.PlaceCannonPacket;
-import com.benberi.cadesim.client.packet.out.PlaceMovePacket;
+import com.benberi.cadesim.client.packet.out.*;
 import com.benberi.cadesim.game.entity.EntityManager;
 import com.benberi.cadesim.game.entity.vessel.move.MoveType;
 import com.benberi.cadesim.game.scene.ConnectScene;
@@ -289,10 +286,14 @@ public class GameContext {
     }
 
     public void dispose() {
+        controlArea.dispose();
+        seaBattleScene.dispose();
+        entities.dispose();
         isReady = false;
         connected = false;
         connectScene.setup();
-        connectScene.setPopup("You have disconnected from the server.");
+        if (!connectScene.hasPopup())
+            connectScene.setPopup("You have disconnected from the server.");
     }
 
     public void sendManuaverSlotChanged(int manuaverSlot) {
@@ -305,6 +306,18 @@ public class GameContext {
         PlaceCannonPacket packet = new PlaceCannonPacket();
         packet.setSide(side);
         packet.setSlot(slot);
+        sendPacket(packet);
+    }
+
+    public void sendToggleAuto(boolean auto) {
+        AutoSealGenerationTogglePacket packet = new AutoSealGenerationTogglePacket();
+        packet.setToggle(auto);
+        sendPacket(packet);
+    }
+
+    public void sendGenerationTarget(MoveType targetMove) {
+        SetSealGenerationTargetPacket packet = new SetSealGenerationTargetPacket();
+        packet.setTargetMove(targetMove.getId());
         sendPacket(packet);
     }
 }

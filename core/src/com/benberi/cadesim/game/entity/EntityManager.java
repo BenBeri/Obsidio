@@ -105,4 +105,8 @@ public class EntityManager {
     public int count() {
         return vessels.size();
     }
+
+    public void dispose() {
+        vessels.clear();
+    }
 }

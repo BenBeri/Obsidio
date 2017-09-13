@@ -10,8 +10,6 @@ import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.game.scene.GameScene;
 import com.benberi.cadesim.game.scene.SceneComponent;
 
-import javax.xml.soap.Text;
-
 public class GameInformation extends SceneComponent {
 
     /**
@@ -96,6 +94,13 @@ public class GameInformation extends SceneComponent {
         timeFont.draw(batch, (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds), 32,50 );
 
         batch.end();
+    }
+
+    @Override
+    public void dispose() {
+        teamOneScore = 0;
+        teamTwoScore = 0;
+        time = 0;
     }
 
     @Override

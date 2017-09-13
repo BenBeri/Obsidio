@@ -28,9 +28,6 @@ import java.util.List;
 
 public class SeaBattleScene implements GameScene {
 
-    private static final float velocityTurns = 0.025f;
-    private static final float velocityForward = 0.03f;
-
     /**
      * The main game context
      */
@@ -40,11 +37,6 @@ public class SeaBattleScene implements GameScene {
      * The sprite batch renderer
      */
     private SpriteBatch batch;
-
-    /**
-     * Batch for some UI elements over the battle arena
-     */
-    private SpriteBatch uiBatch;
 
     /**
      * The battle map
@@ -61,17 +53,34 @@ public class SeaBattleScene implements GameScene {
      */
     private Texture sea;
 
+    /**
+     * The shape renderer
+     */
     private ShapeRenderer renderer;
+
     /**
      * If the user can drag the map
      */
     private boolean canDragMap;
 
+    /**
+     * The game information panel
+     */
     private GameInformation information;
 
+    /**
+     * The sea battle font for ship names
+     */
     private BitmapFont font;
 
+    /**
+     * The current execution slot move
+     */
     private int currentSlot = -1;
+
+    /**
+     * The current executing phase
+     */
     private MovePhase currentPhase;
 
     public SeaBattleScene(GameContext context) {
@@ -401,7 +410,9 @@ public class SeaBattleScene implements GameScene {
 
     @Override
     public void dispose() {
-
+        currentPhase = MovePhase.MOVE_TOKEN;
+        currentSlot = -1;
+        information.dispose();
     }
 
     @Override

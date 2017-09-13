@@ -384,7 +384,7 @@ public abstract class Vessel extends Entity {
 
     public void performRightShoot(int rightShoots) {
         if (rightShoots == 1) {
-            Vector2 target = getClosestLeftCannonCollide();
+            Vector2 target = getClosestRightCannonCollide();
             CannonBall ball = createCannon(getContext(), this, target);
             if (getContext().getEntities().getVesselByPosition(target.x, target.y) != null) {
                 ball.setExplodeOnReach(true);

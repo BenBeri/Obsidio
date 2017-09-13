@@ -38,7 +38,7 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
     /**
      * The available shoots
      */
-    private int cannons;
+    private int cannons = 0;
 
     /**
      * The selected moves
@@ -103,6 +103,9 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
     private TextureRegion sandBottom;
     private TextureRegion sandTop;
 
+    private TextureRegion emptyCannon;
+    private TextureRegion cannon;
+
     private Texture sandTrickleTexture;
     private TextureRegion sandTrickle;
 
@@ -125,6 +128,9 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
     private Texture radioOff;
     private Texture autoOn;
     private Texture autoOff;
+
+    private Texture cannonSelection;
+    private Texture cannonSelectionEmpty;
 
     private int manuaverSlot = 3;
 
@@ -182,11 +188,15 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
         shipStatus = new Texture("core/assets/ui/status.png");
         shipStatusBg = new Texture("core/assets/ui/status-bg.png");
         moveGetTargetTexture = new Texture("core/assets/ui/sel_border_square.png");
-
+        cannonSelectionEmpty = new Texture("core/assets/ui/grapplecannon_empty.png");
+        cannonSelection = new Texture("core/assets/ui/grapplecannon.png");
         damage = new TextureRegion(new Texture("core/assets/ui/damage.png"));
         bilge = new TextureRegion(new Texture("core/assets/ui/bilge.png"));
         damage.flip(false, true);
         bilge.flip(false, true);
+
+        emptyCannon = new TextureRegion(cannonSelectionEmpty, 25, 0, 25, 25);
+        cannon = new TextureRegion(cannonSelection, 25, 0, 25, 25);
 
         damage.setRegionWidth(damage.getTexture().getWidth());
         bilge.setRegionWidth(bilge.getTexture().getWidth());
@@ -240,6 +250,13 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
         renderMoveControl();
     }
 
+    @Override
+    public void dispose() {
+        resetMoves();
+        targetMove = MoveType.FORWARD;
+        manuaverSlot = 3;
+    }
+
 
     @Override
     public boolean handleClick(float x, float y, int button) {
@@ -286,14 +303,28 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
                 getContext().sendAddCannon(1, 3);
             }
         }
-        else if (isChosedLeft(x, y)) {
-            this.targetMove = MoveType.LEFT;
+        else if (isTogglingAuto(x, y)) {
+            if (auto) {
+                auto = false;
+            }
+            else {
+                auto = true;
+            }
+            getContext().sendToggleAuto(auto);
         }
-        else if (isChosedForward(x, y)) {
-            this.targetMove = MoveType.FORWARD;
-        }
-        else if (isChosedRight(x, y)) {
-            this.targetMove = MoveType.RIGHT;
+        else if (!auto){
+             if (isChosedLeft(x, y)) {
+                this.targetMove = MoveType.LEFT;
+                getContext().sendGenerationTarget(targetMove);
+            }
+            else if (isChosedForward(x, y)) {
+                this.targetMove = MoveType.FORWARD;
+                 getContext().sendGenerationTarget(targetMove);
+            }
+            else if (isChosedRight(x, y)) {
+                this.targetMove = MoveType.RIGHT;
+                 getContext().sendGenerationTarget(targetMove);
+            }
         }
 
         return false;
@@ -301,6 +332,10 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
 
     private void handleLeftCannonPlace(float x, float y) {
 
+    }
+
+    private boolean isTogglingAuto(float x, float y) {
+        return x >= 52 && x <= 68 && y >= 579 && y <= 591;
     }
 
     private boolean isPlacingLeftCannons(float x, float y) {
@@ -527,8 +562,10 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
     }
 
     private void drawMoveHolder() {
+
         // The hand bg
         batch.draw(shiphand, controlBackground.getWidth() - shiphand.getWidth() - 80, 19);
+
 
         int height = controlBackground.getHeight() - 40;
         for (int i = 0; i < movesHolder.length; i++) {
@@ -586,6 +623,24 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
      * Draws the movement selection section
      */
     private void drawMovesSelect() {
+
+        font.draw(batch, "Auto", 18, controlBackground.getHeight() - 54);
+        if (auto) {
+            batch.draw(autoOn, 53, controlBackground.getHeight() - 70);
+        }
+        else {
+            batch.draw(autoOff, 53, controlBackground.getHeight() - 70);
+        }
+
+        if (cannons > 0) {
+            batch.draw(cannon, 49, controlBackground.getHeight() - 103);
+        }
+        else {
+            batch.draw(emptyCannon, 49, controlBackground.getHeight() - 103);
+        }
+
+        font.draw(batch, "x" + Integer.toString(cannons), 56, controlBackground.getHeight() - 109);
+
         int x = 80;
         int y = controlBackground.getHeight() - 100;
 
@@ -708,6 +763,7 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
             movesHolder[i].resetLeft();
             movesHolder[i].resetRight();
         }
+        cannons = 0;
     }
 
     public void setCannons(int side, int slot, int amount) {
@@ -721,5 +777,9 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
             for (int i = 0; i < amount; i++)
                 movesHolder[slot].addRight();
         }
+    }
+
+    public void setMoveSealTarget(MoveType moveSealTarget) {
+        this.targetMove = moveSealTarget;
     }
 }
