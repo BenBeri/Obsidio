@@ -88,5 +88,6 @@ public class ClientPacketHandler {
         packets.put(9, new MovesBarUpdate(context));
         packets.put(10, new CannonSlotPlacedPacket(context));
         packets.put(11, new TargetSealPacket(context));
+        packets.put(12, new PlayerRespawnPacket(context));
     }
 }

@@ -6,6 +6,7 @@ import com.benberi.cadesim.client.packet.ClientPacketExecutor;
 import com.benberi.cadesim.game.entity.vessel.Vessel;
 import com.benberi.cadesim.game.entity.vessel.VesselMovementAnimation;
 import com.benberi.cadesim.game.entity.vessel.move.MoveAnimationTurn;
+import com.benberi.cadesim.game.entity.vessel.move.MoveType;
 
 public class TurnAnimationPacket extends ClientPacketExecutor {
 
@@ -26,13 +27,17 @@ public class TurnAnimationPacket extends ClientPacketExecutor {
             if (vessel != null) {
                 for (int slot = 0; slot < 4; slot++) {
                     MoveAnimationTurn turn = vessel.getStructure().getTurn(slot);
+                    turn.setTokenUsed(MoveType.forId(p.readByte()));
                     turn.setAnimation(VesselMovementAnimation.forId(p.readByte()));
                     turn.setSubAnimation(VesselMovementAnimation.forId(p.readByte()));
                     turn.setLeftShoots(p.readByte());
                     turn.setRightShoots(p.readByte());
-                }
 
-                System.out.println(name + ": " + vessel.getStructure().toString());
+                    byte sunk = p.readByte();
+                    if (sunk == 1) {
+                        turn.setSunk(true);
+                    }
+                }
             }
             else {
                 p.getBuffer().readerIndex(p.getBuffer().readerIndex() + 4);

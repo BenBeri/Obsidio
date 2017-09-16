@@ -16,8 +16,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.benberi.cadesim.Constants;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.util.RandomUtils;
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
 public class ConnectScene implements GameScene, InputProcessor {
 
@@ -250,6 +252,13 @@ public class ConnectScene implements GameScene, InputProcessor {
             }
             batch.end();
         }
+
+
+        batch.begin();
+            font.setColor(Color.YELLOW);
+            font.draw(batch, Constants.name, 15, Gdx.graphics.getHeight() - 20);
+            batch.end();
+
     }
 
 

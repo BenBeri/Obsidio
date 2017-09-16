@@ -2,6 +2,8 @@ package com.benberi.cadesim;
 
 public class Constants {
 
+    public static final String name = "Obsidio pre-alpha 4";
+
     /**
      * The port the simulator is using
      */
@@ -12,5 +14,5 @@ public class Constants {
      */
     public static boolean PACKET_DEBUG = false;
 
-    public static final int TURN_TIME = 35;
+    public static final int TURN_TIME = 25;
 }

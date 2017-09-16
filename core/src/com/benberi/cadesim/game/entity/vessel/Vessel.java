@@ -3,6 +3,7 @@ package com.benberi.cadesim.game.entity.vessel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.game.entity.Entity;
 import com.benberi.cadesim.game.entity.projectile.CannonBall;
@@ -73,17 +74,33 @@ public abstract class Vessel extends Entity {
 
     private int smokeTicks;
 
+    private boolean isSinking;
+
+    private boolean isSinkingTexture;
+
+    private int sinkingTicks;
+
+    private boolean isBumping;
+    private VesselBumpVector bumpVector;
+
+
     /**
      * The cannon balls that were shoot
      */
     private List<CannonBall> cannonballs = new ArrayList<CannonBall>();
     private int moveDelay;
+    private boolean bumpReached;
 
     public Vessel(GameContext context, String name, int x, int y) {
         super(context);
         this.name = name;
         this.setPosition(x, y);
         turn = new VesselMoveTurn();
+    }
+
+    public void setBumpReached(boolean bump) {
+        this.bumpReached = bump;
+        bumpVector = new VesselBumpVector(bumpVector.getEnd(), bumpVector.getStart(), bumpVector.getMove());
     }
 
     public void setMovePhase(MovePhase phase) {
@@ -106,6 +123,22 @@ public abstract class Vessel extends Entity {
         this.numberOfMoves = moves;
     }
 
+    public boolean isSinking() {
+        return isSinking;
+    }
+
+    public boolean isSinkingTexture() {
+        return isSinkingTexture;
+    }
+
+    public VesselBumpVector getBumpVector() {
+        return bumpVector;
+    }
+
+    public int getSinkingTicks() {
+        return sinkingTicks;
+    }
+
     /**
      * Starts to perform a given move
      * @param move The move to perform
@@ -118,8 +151,8 @@ public abstract class Vessel extends Entity {
         Vector2 inbetween = null;
         if (move != VesselMovementAnimation.MOVE_FORWARD) {
             // Get the inbetween block by using forward
-            inbetween = new Vector2(start.x + MoveType.FORWARD.getIncrementXForRotation(rotationIndex),
-                    start.y + MoveType.FORWARD.getIncrementYForRotation(rotationIndex));
+            inbetween = new Vector2(start.x +  VesselMovementAnimation.MOVE_FORWARD.getIncrementXForRotation(rotationIndex),
+                    start.y + VesselMovementAnimation.MOVE_FORWARD.getIncrementYForRotation(rotationIndex));
             this.rotationTargetIndex = move.getRotationTargetIndex(rotationIndex);
         }
 
@@ -131,6 +164,43 @@ public abstract class Vessel extends Entity {
         setMoving(true);
     }
 
+    public void performBump(MoveType move, VesselMovementAnimation animation) {
+        this.isBumping = true;
+        this.isMoving = true;
+        currentPerformingMove = animation;
+        Vector2 target = animation.getBumpTargetPosition(rotationIndex);
+        bumpVector = new VesselBumpVector(new Vector2(getX(), getY()), new Vector2(getX() + target.x, getY() + target.y), move);
+        tickBumpRotation(1);
+    }
+
+    public void tickBumpRotation(int amount) {
+        switch (bumpVector.getMove()) {
+            case LEFT:
+                if (rotationIndex - amount < 0) {
+                    setRotationIndex(16 - amount);
+                }
+                else {
+                    setRotationIndex(getRotationIndex() - amount);
+                }
+                break;
+            case RIGHT:
+                if (rotationIndex + amount > 15) {
+                    setRotationIndex(-1 + amount);
+                }
+                else {
+                    setRotationIndex(getRotationIndex() + amount);
+                }
+                break;
+        }
+    }
+
+    public boolean isBumping() {
+        return this.isBumping;
+    }
+
+    public void setBumping(boolean bump) {
+        this.isBumping = false;
+    }
 
     public String getName() {
         return this.name;
@@ -245,6 +315,12 @@ public abstract class Vessel extends Entity {
      */
     public void setRotationIndex(int index) {
         this.rotationIndex = index;
+        if (this.rotationIndex < 0) {
+            this.rotationIndex = 15;
+        }
+        if (rotationIndex > 15) {
+            rotationIndex = 0;
+        }
         this.updateRotation();
     }
 
@@ -348,6 +424,9 @@ public abstract class Vessel extends Entity {
 
     public abstract VesselMoveType getMoveType();
 
+    public abstract void setDefaultTexture();
+    public abstract void setSinkingTexture();
+
     public List<CannonBall> getCannonballs() {
         return this.cannonballs;
     }
@@ -410,8 +489,58 @@ public abstract class Vessel extends Entity {
         isSmoking = true;
     }
 
+    public void setSinking(boolean sinking) {
+        this.isSinking = sinking;
+        if (!isSinking) {
+            setDefaultTexture();
+            isSinkingTexture = false;
+        }
+    }
+
     public void setMoveDelay() {
         this.moveDelay = 70;
     }
 
+    public void tickNonSinkingTexture() {
+        if (sinkingTicks == 6) {
+            int next = rotationIndex - 1;
+            if (next < 0) {
+                next = 14;
+            }
+            setRotationIndex(next);
+            if (next == 8) {
+                setSinkingTexture();
+                setRotationIndex(0);
+                isSinkingTexture = true;
+            }
+            sinkingTicks = 0;
+        }
+        else {
+            sinkingTicks++;
+        }
+    }
+
+    public void tickSinkingTexture() {
+        if (sinkingTicks == 5) {
+            if (rotationIndex + 1 >= this.getOrientationPack().getAllOrientations().size()) {
+                return;
+            }
+            setRotationIndex(rotationIndex + 1);
+            sinkingTicks = 0;
+        }
+        else {
+            sinkingTicks++;
+        }
+    }
+
+    public boolean isBumpReached() {
+        return bumpReached;
+    }
+
+    public void disposeBump() {
+        isBumping = false;
+        bumpVector = null;
+        bumpReached = false;
+        isMoving = false;
+    }
 }

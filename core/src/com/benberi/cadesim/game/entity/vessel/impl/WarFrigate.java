@@ -19,12 +19,7 @@ public class WarFrigate extends Vessel {
     @Override
     public void create() {
         try {
-            this.setTexture(getContext().getTextures().getVessel("warfrigate"));
-            this.setOrientationPack(getContext().getTools().getGson().fromJson(
-                    Gdx.files.internal("core/assets/vessel/wf/properties.json").readString(),
-                    PackedShipOrientation.class));
-
-            this.setRotationIndex(14);
+            setDefaultTexture();
             this.shootSmoke = new TextureRegion(getContext().getTextures().getMisc("explode_big"));
             shootSmoke.setRegion(0,0,40, 30);
         } catch (Exception e) {
@@ -45,5 +40,21 @@ public class WarFrigate extends Vessel {
     @Override
     public VesselMoveType getMoveType() {
         return VesselMoveType.THREE_MOVES;
+    }
+
+    @Override
+    public void setDefaultTexture() {
+        this.setTexture(getContext().getTextures().getVessel("warfrigate"));
+        this.setOrientationPack(getContext().getTools().getGson().fromJson(
+                Gdx.files.internal("core/assets/vessel/wf/properties.json").readString(),
+                PackedShipOrientation.class));
+    }
+
+    @Override
+    public void setSinkingTexture() {
+        this.setTexture(getContext().getTextures().getVessel("warfrigate_sinking"));
+        this.setOrientationPack(getContext().getTools().getGson().fromJson(
+                Gdx.files.internal("core/assets/vessel/wf/sinking.json").readString(),
+                PackedShipOrientation.class));
     }
 }

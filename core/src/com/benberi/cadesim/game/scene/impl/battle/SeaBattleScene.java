@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.game.entity.projectile.CannonBall;
 import com.benberi.cadesim.game.entity.vessel.Vessel;
+import com.benberi.cadesim.game.entity.vessel.VesselBumpVector;
 import com.benberi.cadesim.game.entity.vessel.VesselMoveType;
 import com.benberi.cadesim.game.entity.vessel.VesselMovementAnimation;
 import com.benberi.cadesim.game.entity.vessel.move.MoveAnimationTurn;
@@ -118,7 +119,13 @@ public class SeaBattleScene implements GameScene {
         camera.update();
 
         if (currentSlot > -1) {
-            if (context.getEntities().countVsselsByPhase(currentPhase) == context.getEntities().count()) {
+            if (context.getEntities().countVsselsByPhase(currentPhase) == context.getEntities().countNonSinking()) {
+                for (Vessel vessel : context.getEntities().listVesselEntities()) {
+                    MoveAnimationTurn turn = vessel.getStructure().getTurn(currentSlot);
+                    if (turn.isSunk()) {
+                        vessel.setSinking(true);
+                    }
+                }
                 MovePhase phase = MovePhase.getNext(currentPhase);
                 if (phase == null) {
                     currentPhase = MovePhase.MOVE_TOKEN;
@@ -139,15 +146,32 @@ public class SeaBattleScene implements GameScene {
         }
 
         for (Vessel vessel : context.getEntities().listVesselEntities()) {
+            if (vessel.isSinking()) {
+                if (!vessel.isSinkingTexture()) {
+                    vessel.tickNonSinkingTexture();
+                }
+                else {
+                    vessel.tickSinkingTexture();
+                }
+                continue;
+            }
             if (vessel.getMoveDelay() != -1) {
                 vessel.tickMoveDelay();
             }
+
             if (!vessel.isMoving()) {
                 if (currentSlot != -1) {
                     MoveAnimationTurn turn = vessel.getStructure().getTurn(currentSlot);
                     if (currentPhase == MovePhase.MOVE_TOKEN && vessel.getMovePhase() == null) {
                         if (turn.getAnimation() != VesselMovementAnimation.NO_ANIMATION && vessel.getMoveDelay() == -1) {
-                            vessel.performMove(turn.getAnimation());
+                            if (!VesselMovementAnimation.isBump(turn.getAnimation())) {
+                                vessel.performMove(turn.getAnimation());
+
+                            }
+                            else {
+                                vessel.performBump(turn.getTokenUsed(), turn.getAnimation());
+                            }
+
                             turn.setAnimation(VesselMovementAnimation.NO_ANIMATION);
                         }
                         else {
@@ -181,70 +205,116 @@ public class SeaBattleScene implements GameScene {
                 }
             }
             else {
-                VesselMovementAnimation move = vessel.getCurrentPerformingMove();
+                if (vessel.isBumping()) {
+                    VesselBumpVector vector = vessel.getBumpVector();
+                    if (!vessel.isBumpReached()) {
+                        System.out.println(vector.getDirectionX());
 
-                Vector2 start = vessel.getAnimation().getStartPoint();
-                Vector2 inbetween = vessel.getAnimation().getInbetweenPoint();
-                Vector2 end = vessel.getAnimation().getEndPoint();
-                Vector2 current = vessel.getAnimation().getCurrentAnimationLocation();
+                        float speed = vessel.getCurrentPerformingMove() == VesselMovementAnimation.BUMP_PHASE_1 ? 2f : 2.5f;
 
-                // calculate step based on progress towards target (0 -> 1)
-                // float step = 1 - (ship.getEndPoint().dst(ship.getLinearVector()) / ship.getDistanceToEndPoint());
+                        vessel.setX(vessel.getX() + (vector.getDirectionX() * speed * Gdx.graphics.getDeltaTime()));
+                        vessel.setY(vessel.getY() + (vector.getDirectionY() * speed * Gdx.graphics.getDeltaTime()));
 
+                        float distance = vector.getStart().dst(new Vector2(vessel.getX(), vessel.getY()));
+                        if(distance >= vector.getDistance())
+                        {
+                            vessel.setPosition(vector.getEnd().x, vector.getEnd().y);
+                            vessel.setBumpReached(true);
+                            if (vessel.getCurrentPerformingMove() == VesselMovementAnimation.BUMP_PHASE_1) {
+                                vessel.tickBumpRotation(2);
+                            }
+                            else {
+                                vessel.tickBumpRotation(1);
+                            }
 
-                float velocityTurns = (0.011f * Gdx.graphics.getDeltaTime()) * 100; //Gdx.graphics.getDeltaTime();
-                float velocityForward = (0.015f * Gdx.graphics.getDeltaTime()) * 100; //Gdx.graphics.getDeltaTime();
-
-                if (move != VesselMovementAnimation.MOVE_FORWARD) {
-                    vessel.getAnimation().addStep(velocityTurns);
-                    // step on curve (0 -> 1), first bezier point, second bezier point, third bezier point, temporary vector for calculations
-                    Bezier.quadratic(current, (float) vessel.getAnimation().getCurrentStep(), start.cpy(),
-                            inbetween.cpy(), end.cpy(), new Vector2());
-                }
-                else {
-                    // When ship moving forward, we may not want to use the curve
-                    int add = move.getIncrementXForRotation(vessel.getRotationIndex());
-                    if (add == -1 || add == 1) {
-                        current.x += (velocityForward * (float) add);
-                        //current.x += (velocityForward * (float) add);
+                        }
+                        else if (vessel.getCurrentPerformingMove() == VesselMovementAnimation.BUMP_PHASE_2 && distance >= vector.getDistance() / 2 && !vector.isPlayedMiddleAnimation()) {
+                            vessel.tickBumpRotation(1);
+                            vector.setPlayedMiddleAnimation(true);
+                        }
                     }
                     else {
-                        add = move.getIncrementYForRotation(vessel.getRotationIndex());
-                       // current.y += (velocityForward * (float) add);
-                        current.y += (velocityForward * (float) add);
+                        if (vessel.getCurrentPerformingMove() == VesselMovementAnimation.BUMP_PHASE_1) {
+                            vessel.setX(vessel.getX() + (vector.getDirectionX() * 2f * Gdx.graphics.getDeltaTime()));
+                            vessel.setY(vessel.getY() + (vector.getDirectionY() * 2f * Gdx.graphics.getDeltaTime()));
+                            if (vector.getStart().dst(new Vector2(vessel.getX(), vessel.getY())) >= vector.getDistance()) {
+                                vessel.setPosition(vector.getEnd().x, vector.getEnd().y);
+                                vessel.tickBumpRotation(2);
+                                vessel.disposeBump();
+                            }
+                        }
+                        else {
+                            vessel.tickBumpRotation(1);
+                            vessel.disposeBump();
+                        }
                     }
-                   /// vessel.getAnimation().addStep(velocityForward);
-                    vessel.getAnimation().addStep(velocityForward);
-                }
-
-                int result = (int) (vessel.getAnimation().getCurrentStep() * 100);
-                vessel.getAnimation().tickAnimationTicks(velocityTurns * 100);
-                //System.out.println(result);
-
-                // check if the step is reached to the end, and dispose the movement
-                if (result >= 100) {
-                    vessel.setX(end.x);
-                    vessel.setY(end.y);
-                    vessel.setMoving(false);
-
-                    if (move != VesselMovementAnimation.MOVE_FORWARD)
-                        vessel.setRotationIndex(vessel.getRotationTargetIndex());
-
-                    vessel.setMovePhase(MovePhase.getNext(vessel.getMovePhase()));
-                    vessel.setMoveDelay();
                 }
                 else {
-                    // process move
-                    vessel.setX(current.x);
-                    vessel.setY(current.y);
-                }
+                    VesselMovementAnimation move = vessel.getCurrentPerformingMove();
 
-                System.out.println(vessel.getAnimation().getAnimationTicks());
+                    Vector2 start = vessel.getAnimation().getStartPoint();
+                    Vector2 inbetween = vessel.getAnimation().getInbetweenPoint();
+                    Vector2 end = vessel.getAnimation().getEndPoint();
+                    Vector2 current = vessel.getAnimation().getCurrentAnimationLocation();
 
-                // tick rotation of the ship image
-                if (vessel.getAnimation().getAnimationTicks() >= 14) {
-                    vessel.tickRotation();
-                    vessel.getAnimation().resetAnimationTicks();
+                    // calculate step based on progress towards target (0 -> 1)
+                    // float step = 1 - (ship.getEndPoint().dst(ship.getLinearVector()) / ship.getDistanceToEndPoint());
+
+
+                    float velocityTurns = (0.011f * Gdx.graphics.getDeltaTime()) * 100; //Gdx.graphics.getDeltaTime();
+                    float velocityForward = (0.015f * Gdx.graphics.getDeltaTime()) * 100; //Gdx.graphics.getDeltaTime();
+
+                    if (move != VesselMovementAnimation.MOVE_FORWARD) {
+                        vessel.getAnimation().addStep(velocityTurns);
+                        // step on curve (0 -> 1), first bezier point, second bezier point, third bezier point, temporary vector for calculations
+                        Bezier.quadratic(current, (float) vessel.getAnimation().getCurrentStep(), start.cpy(),
+                                inbetween.cpy(), end.cpy(), new Vector2());
+                    }
+                    else {
+                        // When ship moving forward, we may not want to use the curve
+                        int add = move.getIncrementXForRotation(vessel.getRotationIndex());
+                        if (add == -1 || add == 1) {
+                            current.x += (velocityForward * (float) add);
+                            //current.x += (velocityForward * (float) add);
+                        }
+                        else {
+                            add = move.getIncrementYForRotation(vessel.getRotationIndex());
+                            // current.y += (velocityForward * (float) add);
+                            current.y += (velocityForward * (float) add);
+                        }
+                        /// vessel.getAnimation().addStep(velocityForward);
+                        vessel.getAnimation().addStep(velocityForward);
+                    }
+
+                    int result = (int) (vessel.getAnimation().getCurrentStep() * 100);
+                    vessel.getAnimation().tickAnimationTicks(velocityTurns * 100);
+                    //System.out.println(result);
+
+                    // check if the step is reached to the end, and dispose the movement
+                    if (result >= 100) {
+                        vessel.setX(end.x);
+                        vessel.setY(end.y);
+                        vessel.setMoving(false);
+
+                        if (move != VesselMovementAnimation.MOVE_FORWARD)
+                            vessel.setRotationIndex(vessel.getRotationTargetIndex());
+
+                        vessel.setMovePhase(MovePhase.getNext(vessel.getMovePhase()));
+                        vessel.setMoveDelay();
+                    }
+                    else {
+                        // process move
+                        vessel.setX(current.x);
+                        vessel.setY(current.y);
+                    }
+
+                    System.out.println(vessel.getAnimation().getAnimationTicks());
+
+                    // tick rotation of the ship image
+                    if (vessel.getAnimation().getAnimationTicks() >= 14) {
+                        vessel.tickRotation();
+                        vessel.getAnimation().resetAnimationTicks();
+                    }
                 }
             }
         }

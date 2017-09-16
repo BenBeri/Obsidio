@@ -78,7 +78,7 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
     /**
      * If the move selection is automatic or not
      */
-    private boolean auto;
+    private boolean auto = true;
 
     /**
      * The turn time
@@ -254,6 +254,7 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
     public void dispose() {
         resetMoves();
         targetMove = MoveType.FORWARD;
+        auto = true;
         manuaverSlot = 3;
     }
 
@@ -400,6 +401,7 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
             if (button == Input.Buttons.LEFT) {
                 //move.setMove(MoveType.LEFT);
                 if (leftMoves > 0) {
+                    placeMove(position, MoveType.LEFT);
                     getContext().sendSelectMoveSlot(position, MoveType.LEFT);
                 }
                 else if (forwardMoves > 0) {
