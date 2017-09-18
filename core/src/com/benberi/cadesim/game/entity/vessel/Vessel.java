@@ -177,15 +177,15 @@ public abstract class Vessel extends Entity {
         switch (bumpVector.getMove()) {
             case LEFT:
                 if (rotationIndex - amount < 0) {
-                    setRotationIndex(16 - amount);
+                    setRotationIndex(16 - Math.abs(rotationIndex - amount));
                 }
                 else {
-                    setRotationIndex(getRotationIndex() - amount);
+                    setRotationIndex(rotationIndex - amount);
                 }
                 break;
             case RIGHT:
                 if (rotationIndex + amount > 15) {
-                    setRotationIndex(-1 + amount);
+                    setRotationIndex((rotationIndex + amount) - 16);
                 }
                 else {
                     setRotationIndex(getRotationIndex() + amount);

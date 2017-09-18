@@ -239,7 +239,7 @@ public class SeaBattleScene implements GameScene {
                             vessel.setY(vessel.getY() + (vector.getDirectionY() * 2f * Gdx.graphics.getDeltaTime()));
                             if (vector.getStart().dst(new Vector2(vessel.getX(), vessel.getY())) >= vector.getDistance()) {
                                 vessel.setPosition(vector.getEnd().x, vector.getEnd().y);
-                                vessel.tickBumpRotation(2);
+                                vessel.tickBumpRotation(1);
                                 vessel.disposeBump();
                             }
                         }
