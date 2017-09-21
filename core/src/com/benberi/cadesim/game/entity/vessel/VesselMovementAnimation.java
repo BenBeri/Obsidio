@@ -173,18 +173,22 @@ public enum VesselMovementAnimation {
         return 0;
     }
 
+    public boolean isOneDimensionMove() {
+        return this == MOVE_FORWARD || this == MOVE_BACKWARD || this == MOVE_LEFT || this == MOVE_RIGHT;
+    }
+
     public Vector2 getBumpTargetPosition(int rotationIndex) {
         switch (this) {
             case BUMP_PHASE_1:
                 switch (rotationIndex) {
                     case Face.NORTH:
-                        return new Vector2(0, 0.4f);
+                        return new Vector2(0, 0.2f);
                     case Face.SOUTH:
-                        return new Vector2(0, -0.4f);
+                        return new Vector2(0, -0.2f);
                     case Face.EAST:
-                        return new Vector2(0.4f, 0);
+                        return new Vector2(0.2f, 0);
                     case Face.WEST:
-                        return new Vector2(-0.4f, 0);
+                        return new Vector2(-0.2f, 0);
                 }
             case BUMP_PHASE_2:
                 return new Vector2(MOVE_FORWARD.getIncrementXForRotation(rotationIndex), MOVE_FORWARD.getIncrementYForRotation(rotationIndex));

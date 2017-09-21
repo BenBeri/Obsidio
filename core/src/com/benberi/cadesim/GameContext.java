@@ -60,6 +60,8 @@ public class GameContext {
      */
     private EntityManager entities;
 
+    public String myVessel;
+
     /**
      * List of scenes
      */
@@ -241,6 +243,7 @@ public class GameContext {
                 serverChannel = channel; // initialize the server channel
                 connectScene.setState(ConnectionSceneState.CREATING_PROFILE);
                 sendLoginPacket(displayName); // send login packet
+                myVessel = displayName;
             }
 
             @Override

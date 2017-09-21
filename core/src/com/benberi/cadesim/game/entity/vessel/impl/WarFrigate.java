@@ -8,7 +8,7 @@ import com.benberi.cadesim.game.entity.projectile.CannonBall;
 import com.benberi.cadesim.game.entity.projectile.impl.LargeCannonball;
 import com.benberi.cadesim.game.entity.vessel.Vessel;
 import com.benberi.cadesim.game.entity.vessel.VesselMoveType;
-import com.benberi.cadesim.util.PackedShipOrientation;
+import com.benberi.cadesim.util.PackedObjectOrientation;
 
 public class WarFrigate extends Vessel {
 
@@ -47,7 +47,7 @@ public class WarFrigate extends Vessel {
         this.setTexture(getContext().getTextures().getVessel("warfrigate"));
         this.setOrientationPack(getContext().getTools().getGson().fromJson(
                 Gdx.files.internal("core/assets/vessel/wf/properties.json").readString(),
-                PackedShipOrientation.class));
+                PackedObjectOrientation.class));
     }
 
     @Override
@@ -55,6 +55,6 @@ public class WarFrigate extends Vessel {
         this.setTexture(getContext().getTextures().getVessel("warfrigate_sinking"));
         this.setOrientationPack(getContext().getTools().getGson().fromJson(
                 Gdx.files.internal("core/assets/vessel/wf/sinking.json").readString(),
-                PackedShipOrientation.class));
+                PackedObjectOrientation.class));
     }
 }

@@ -3,7 +3,7 @@ package com.benberi.cadesim.game.entity;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.util.OrientationLocation;
-import com.benberi.cadesim.util.PackedShipOrientation;
+import com.benberi.cadesim.util.PackedObjectOrientation;
 
 public abstract class Entity extends Sprite {
 
@@ -20,7 +20,7 @@ public abstract class Entity extends Sprite {
     /**
      * The orientation pack
      */
-    private PackedShipOrientation orientationPack;
+    private PackedObjectOrientation orientationPack;
 
     /**
      * The orientaiton location
@@ -48,14 +48,14 @@ public abstract class Entity extends Sprite {
      * Sets the packed orientation manager
      * @param o The orientation pack
      */
-    protected void setOrientationPack(PackedShipOrientation o) {
+    protected void setOrientationPack(PackedObjectOrientation o) {
         this.orientationPack = o;
     }
 
     /**
      * @return The packed orientation
      */
-    protected PackedShipOrientation getOrientationPack() {
+    protected PackedObjectOrientation getOrientationPack() {
         return this.orientationPack;
     }
 

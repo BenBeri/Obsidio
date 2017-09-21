@@ -11,6 +11,8 @@ import com.benberi.cadesim.game.entity.vessel.move.MoveAnimationStructure;
 import com.benberi.cadesim.game.entity.vessel.move.MovePhase;
 import com.benberi.cadesim.game.entity.vessel.move.MoveType;
 import com.benberi.cadesim.game.entity.vessel.move.VesselMoveTurn;
+import com.benberi.cadesim.game.scene.impl.battle.map.GameObject;
+import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.BigRock;
 import com.benberi.cadesim.util.OrientationLocation;
 
 import java.util.ArrayList;
@@ -315,12 +317,6 @@ public abstract class Vessel extends Entity {
      */
     public void setRotationIndex(int index) {
         this.rotationIndex = index;
-        if (this.rotationIndex < 0) {
-            this.rotationIndex = 15;
-        }
-        if (rotationIndex > 15) {
-            rotationIndex = 0;
-        }
         this.updateRotation();
     }
 
@@ -342,33 +338,45 @@ public abstract class Vessel extends Entity {
         switch (rotationIndex) {
             case 2:
                 for (int i = 1; i < 4; i++) {
-                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX(), getY() + i);
-                    if (vessel != null) {
-                        return new Vector2(getX(), getY() + i);
+                    float x = getX();
+                    float  y = getY() + i;
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(x, y);
+                    GameObject object = getContext().getBattleScene().getMap().getObject(x, y);
+                    if (vessel != null || object != null && object instanceof BigRock) {
+                        return new Vector2(x, y);
                     }
                 }
                 return new Vector2(getX(), getY() + 3);
             case 6:
                 for (int i = 1; i < 4; i++) {
-                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX() + i, getY());
-                    if (vessel != null) {
-                        return new Vector2(getX() + i, getY());
+                    float x = getX() + i;
+                    float  y = getY();
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(x, y);
+                    GameObject object = getContext().getBattleScene().getMap().getObject(x, y);
+                    if (vessel != null || object != null && object instanceof BigRock) {
+                        return new Vector2(x, y);
                     }
                 }
                 return new Vector2(getX() + 3, getY());
             case 10:
                 for (int i = 1; i < 4; i++) {
-                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX(), getY() - i);
-                    if (vessel != null) {
-                        return new Vector2(getX(), getY() - i);
+                    float x = getX();
+                    float  y = getY() - i;
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(x, y);
+                    GameObject object = getContext().getBattleScene().getMap().getObject(x, y);
+                    if (vessel != null || object != null && object instanceof BigRock) {
+                        return new Vector2(x, y);
                     }
                 }
                 return new Vector2(getX(), getY() - 3);
             case 14:
                 for (int i = 1; i < 4; i++) {
-                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX() - i, getY());
-                    if (vessel != null) {
-                        return new Vector2(getX() - i, getY());
+                    float x = getX() - i;
+                    float  y = getY();
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(x, y);
+                    GameObject object = getContext().getBattleScene().getMap().getObject(x, y);
+                    if (vessel != null || object != null && object instanceof BigRock) {
+                        return new Vector2(x, y);
                     }
                 }
                 return new Vector2(getX() - 3, getY());
@@ -381,33 +389,45 @@ public abstract class Vessel extends Entity {
         switch (rotationIndex) {
             case 2:
                 for (int i = 1; i < 4; i++) {
-                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX(), getY() - i);
-                    if (vessel != null) {
-                        return new Vector2(getX(), getY() - i);
+                    float x = getX();
+                    float  y = getY() - i;
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(x, y);
+                    GameObject object = getContext().getBattleScene().getMap().getObject(x, y);
+                    if (vessel != null || object != null && object instanceof BigRock) {
+                        return new Vector2(x, y);
                     }
                 }
                 return new Vector2(getX(), getY() - 3);
             case 6:
                 for (int i = 1; i < 4; i++) {
-                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX() - i, getY());
-                    if (vessel != null) {
-                        return new Vector2(getX() - i, getY());
+                    float x = getX() - i;
+                    float  y = getY();
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(x, y);
+                    GameObject object = getContext().getBattleScene().getMap().getObject(x, y);
+                    if (vessel != null || object != null && object instanceof BigRock) {
+                        return new Vector2(x, y);
                     }
                 }
                 return new Vector2(getX() - 3, getY());
             case 10:
                 for (int i = 1; i < 4; i++) {
-                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX(), getY() + i);
-                    if (vessel != null) {
-                        return new Vector2(getX(), getY() + i);
+                    float x = getX();
+                    float  y = getY() + i;
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(x, y);
+                    GameObject object = getContext().getBattleScene().getMap().getObject(x, y);
+                    if (vessel != null || object != null && object instanceof BigRock) {
+                        return new Vector2(x, y);
                     }
                 }
                 return new Vector2(getX(), getY() + 3);
             case 14:
                 for (int i = 1; i < 4; i++) {
-                    Vessel vessel = getContext().getEntities().getVesselByPosition(getX() + i, getY());
-                    if (vessel != null) {
-                        return new Vector2(getX() + i, getY());
+                    float x = getX() + i;
+                    float  y = getY();
+                    Vessel vessel = getContext().getEntities().getVesselByPosition(x, y);
+                    GameObject object = getContext().getBattleScene().getMap().getObject(x, y);
+                    if (vessel != null || object != null && object instanceof BigRock) {
+                        return new Vector2(x, y);
                     }
                 }
                 return new Vector2(getX() + 3, getY());
@@ -435,7 +455,7 @@ public abstract class Vessel extends Entity {
         if (leftShoots == 1) {
             Vector2 target = getClosestLeftCannonCollide();
             CannonBall ball = createCannon(getContext(), this, target);
-            if (getContext().getEntities().getVesselByPosition(target.x, target.y) != null) {
+            if (getContext().getEntities().getVesselByPosition(target.x, target.y) != null || getContext().getBattleScene().getMap().getObject(target.x, target.y) instanceof BigRock) {
                 ball.setExplodeOnReach(true);
             }
             cannonballs.add(ball);
@@ -446,7 +466,7 @@ public abstract class Vessel extends Entity {
             CannonBall ball1 = createCannon(getContext(), this, target);
             CannonBall ball2 = createCannon(getContext(), this, target);
 
-            if (getContext().getEntities().getVesselByPosition(target.x, target.y) != null) {
+            if (getContext().getEntities().getVesselByPosition(target.x, target.y) != null || getContext().getBattleScene().getMap().getObject(target.x, target.y) instanceof BigRock) {
                 ball1.setExplodeOnReach(true);
                 ball2.setExplodeOnReach(true);
             }
@@ -542,5 +562,6 @@ public abstract class Vessel extends Entity {
         bumpVector = null;
         bumpReached = false;
         isMoving = false;
+        moveDelay = 40;
     }
 }

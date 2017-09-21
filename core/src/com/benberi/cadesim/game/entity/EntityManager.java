@@ -7,6 +7,7 @@ import com.benberi.cadesim.game.entity.vessel.move.MovePhase;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -41,7 +42,7 @@ public class EntityManager {
 
     public Vessel getVesselByPosition(float x, float y) {
         for (Vessel vessel : vessels) {
-            if (vessel.getX() == x && vessel.getY() == y) {
+            if (Math.round(vessel.getX()) == x && Math.round(vessel.getY()) == y) {
                 return vessel;
             }
         }
@@ -114,5 +115,9 @@ public class EntityManager {
 
     public int countNonSinking() {
         return (int) vessels.stream().filter(v -> !v.isSinking()).count();
+    }
+
+    public void remove(Vessel vessel) {
+        vessels.removeIf(vessel1 -> vessel1 == vessel);
     }
 }

@@ -3,17 +3,17 @@ package com.benberi.cadesim.util;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PackedShipOrientation {
+public class PackedObjectOrientation {
 
     private String name;
 
     private Map<Integer, OrientationLocation> orientations = new HashMap<Integer, OrientationLocation>();
 
-    public PackedShipOrientation(String name) {
+    public PackedObjectOrientation(String name) {
         this.name = name;
     }
 
-    public PackedShipOrientation(String name, Map<Integer, OrientationLocation> o) {
+    public PackedObjectOrientation(String name, Map<Integer, OrientationLocation> o) {
         this.name = name;
         this.orientations = o;
     }

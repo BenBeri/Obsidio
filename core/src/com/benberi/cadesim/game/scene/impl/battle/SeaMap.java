@@ -1,8 +1,11 @@
 package com.benberi.cadesim.game.scene.impl.battle;
 
-import com.benberi.cadesim.game.scene.impl.battle.tile.GameTile;
-import com.benberi.cadesim.game.scene.impl.battle.tile.impl.Cell;
-import com.benberi.cadesim.game.scene.impl.battle.tile.impl.SafeZone;
+import com.benberi.cadesim.GameContext;
+import com.benberi.cadesim.game.scene.impl.battle.map.tile.GameTile;
+import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.BigRock;
+import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.Cell;
+import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.SafeZone;
+import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.SmallRock;
 
 /**
  * Represents a battle arena map
@@ -19,33 +22,16 @@ public class SeaMap {
      */
     public static final int MAP_HEIGHT = 36;
 
+    private GameContext context;
+
     /**
      * Map tiles
      */
     private GameTile[][] tiles = new GameTile[MAP_WIDTH][MAP_HEIGHT];
 
-    public SeaMap(int[][] map) {
-        SafeZone safe = new SafeZone(0);
-
-        for (int i = 0; i < tiles.length; i++) {
-            for(int j = 0; j < tiles[i].length; j++) {
-                if (j < 3) {
-                    tiles[i][j] = safe;
-                }
-                else {
-                    int tile = map[i][j];
-                    tiles[i][j] = getTileForId(tile);
-                }
-
-            }
-        }
-    }
-
-    private GameTile getTileForId(int id) {
-        if (id == 0) {
-            return new Cell(0);
-        }
-        return new Cell(0); // todo change to null
+    public SeaMap(GameContext context, int[][] map) {
+        this.context = context;
+        SafeZone safe = new SafeZone(context);
     }
 
     public GameTile[][] getTiles() {

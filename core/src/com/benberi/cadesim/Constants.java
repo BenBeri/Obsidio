@@ -14,5 +14,5 @@ public class Constants {
      */
     public static boolean PACKET_DEBUG = false;
 
-    public static final int TURN_TIME = 25;
+    public static final int TURN_TIME = 18;
 }
