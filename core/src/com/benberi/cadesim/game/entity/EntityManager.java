@@ -71,6 +71,15 @@ public class EntityManager {
         return count;
     }
 
+    public boolean hasDelayedVessels() {
+        for (Vessel v : vessels) {
+            if (v.hasDelay()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<Vessel> listCoordinateSortedVessels() {
         List<Vessel> v = new ArrayList<>();
         v.addAll(vessels);

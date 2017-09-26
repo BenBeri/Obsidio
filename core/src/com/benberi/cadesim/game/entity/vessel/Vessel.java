@@ -152,9 +152,14 @@ public abstract class Vessel extends Entity {
 
         Vector2 inbetween = null;
         if (move != VesselMovementAnimation.MOVE_FORWARD) {
-            // Get the inbetween block by using forward
-            inbetween = new Vector2(start.x +  VesselMovementAnimation.MOVE_FORWARD.getIncrementXForRotation(rotationIndex),
-                    start.y + VesselMovementAnimation.MOVE_FORWARD.getIncrementYForRotation(rotationIndex));
+            if (!move.isWhirlpoolMove()) {
+                // Get the inbetween block by using forward
+                inbetween = new Vector2(start.x + VesselMovementAnimation.MOVE_FORWARD.getIncrementXForRotation(rotationIndex),
+                        start.y + VesselMovementAnimation.MOVE_FORWARD.getIncrementYForRotation(rotationIndex));
+            }
+            else {
+                inbetween = move.getInbetweenWhirlpool(start);
+            }
             this.rotationTargetIndex = move.getRotationTargetIndex(rotationIndex);
         }
 
@@ -217,6 +222,10 @@ public abstract class Vessel extends Entity {
         if (moveDelay <= 0) {
             moveDelay = -1;
         }
+    }
+
+    public boolean hasDelay() {
+        return moveDelay > -1;
     }
 
     public int getMoveDelay() {
@@ -297,7 +306,7 @@ public abstract class Vessel extends Entity {
         if (currentPerformingMove == VesselMovementAnimation.TURN_LEFT) {
             this.rotationIndex--;
         }
-        else if (currentPerformingMove == VesselMovementAnimation.TURN_RIGHT) {
+        else if (currentPerformingMove == VesselMovementAnimation.TURN_RIGHT || currentPerformingMove.isWhirlpoolMove()){
             this.rotationIndex++;
         }
 

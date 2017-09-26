@@ -21,14 +21,12 @@ import com.benberi.cadesim.game.entity.vessel.VesselMoveType;
 import com.benberi.cadesim.game.entity.vessel.VesselMovementAnimation;
 import com.benberi.cadesim.game.entity.vessel.move.MoveAnimationTurn;
 import com.benberi.cadesim.game.entity.vessel.move.MovePhase;
+import com.benberi.cadesim.game.entity.vessel.move.MoveType;
 import com.benberi.cadesim.game.scene.GameScene;
 import com.benberi.cadesim.game.scene.impl.battle.map.BlockadeMap;
 import com.benberi.cadesim.game.scene.impl.battle.map.GameObject;
 import com.benberi.cadesim.game.scene.impl.battle.map.tile.GameTile;
-import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.BigRock;
-import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.Cell;
-import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.SmallRock;
-import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.Wind;
+import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.*;
 
 import java.util.Iterator;
 import java.util.List;
@@ -126,12 +124,6 @@ public class SeaBattleScene implements GameScene {
 
         if (currentSlot > -1) {
             if (context.getEntities().countVsselsByPhase(currentPhase) == context.getEntities().countNonSinking()) {
-//                for (Vessel vessel : context.getEntities().listVesselEntities()) {
-//                    MoveAnimationTurn turn = vessel.getStructure().getTurn(currentSlot);
-//                    if (turn.isSunk()) {
-//                        vessel.setSinking(true);
-//                    }
-//                }
                 MovePhase phase = MovePhase.getNext(currentPhase);
                 if (phase == null) {
                     for (Vessel vessel : context.getEntities().listVesselEntities()) {
@@ -190,16 +182,22 @@ public class SeaBattleScene implements GameScene {
                             vessel.setMovePhase(MovePhase.getNext(vessel.getMovePhase()));
                         }
                     }
-                    else if (currentPhase == MovePhase.ACTION_MOVE && vessel.getMovePhase() == MovePhase.MOVE_TOKEN && vessel.getMoveDelay() == -1) {
+                    else if (currentPhase == MovePhase.ACTION_MOVE && vessel.getMovePhase() == MovePhase.MOVE_TOKEN && vessel.getMoveDelay() == -1 && !context.getEntities().hasDelayedVessels()) {
                         if (turn.getSubAnimation() != VesselMovementAnimation.NO_ANIMATION) {
-                            vessel.performMove(turn.getSubAnimation());
+                            if (!VesselMovementAnimation.isBump(turn.getSubAnimation())) {
+                                vessel.performMove(turn.getSubAnimation());
+
+                            }
+                            else {
+                                vessel.performBump(MoveType.NONE, turn.getSubAnimation());
+                            }
                             turn.setSubAnimation(VesselMovementAnimation.NO_ANIMATION);
                         }
                         else {
                             vessel.setMovePhase(MovePhase.getNext(vessel.getMovePhase()));
                         }
                     }
-                    else if (currentPhase == MovePhase.SHOOT && vessel.getMovePhase() == MovePhase.ACTION_MOVE  && vessel.getMoveDelay() == -1 && vessel.getCannonballs().size() == 0) {
+                    else if (currentPhase == MovePhase.SHOOT && vessel.getMovePhase() == MovePhase.ACTION_MOVE  && vessel.getMoveDelay() == -1 && vessel.getCannonballs().size() == 0 && !context.getEntities().hasDelayedVessels()) {
                         if (turn.getLeftShoots() == 0 && turn.getRightShoots() == 0) {
                             vessel.setMovePhase(MovePhase.getNext(vessel.getMovePhase()));
                         }
@@ -220,8 +218,6 @@ public class SeaBattleScene implements GameScene {
                 if (vessel.isBumping()) {
                     VesselBumpVector vector = vessel.getBumpVector();
                     if (!vessel.isBumpReached()) {
-                        System.out.println(vector.getDirectionX());
-
                         float speed = vessel.getCurrentPerformingMove() == VesselMovementAnimation.BUMP_PHASE_1 ? 1f : 1.75f;
 
                         vessel.setX(vessel.getX() + (vector.getDirectionX() * speed * Gdx.graphics.getDeltaTime()));
@@ -246,7 +242,7 @@ public class SeaBattleScene implements GameScene {
                         }
                     }
                     else {
-                        if (vessel.getCurrentPerformingMove() == VesselMovementAnimation.BUMP_PHASE_1) {
+                        if (vessel.getCurrentPerformingMove() == VesselMovementAnimation.BUMP_PHASE_1 || vessel.getCurrentPerformingMove().getId() >= 12) {
                             vessel.setX(vessel.getX() + (vector.getDirectionX() * 2f * Gdx.graphics.getDeltaTime()));
                             vessel.setY(vessel.getY() + (vector.getDirectionY() * 2f * Gdx.graphics.getDeltaTime()));
                             if (vector.getStart().dst(new Vector2(vessel.getX(), vessel.getY())) >= vector.getDistance()) {
@@ -424,24 +420,6 @@ public class SeaBattleScene implements GameScene {
             }
         }
 
-
-//        List<Vessel> sortedVessels = context.getEntities().listVesselEntities();
-//
-//        /*
-//         * Render vessels
-//         */
-//        for (Vessel vessel : context.getEntities().listCoordinateSortedVessels()) {
-//
-//            // X position of the vessel
-//            float x = getIsometricX(vessel.getX(), vessel.getY(), vessel);
-//
-//            // Y position of the vessel
-//            float y = getIsometricY(vessel.getX(), vessel.getY(), vessel);
-//
-//            // draw vessel
-//            batch.draw(vessel, x + vessel.getOrientationLocation().getOffsetx(), y + vessel.getOrientationLocation().getOffsety());
-//        }
-
         /*
          * Render cannon balls
          */
@@ -564,6 +542,7 @@ public class SeaBattleScene implements GameScene {
 
         Cell[][] sea = blockadeMap.getSea();
         Wind[][] winds = blockadeMap.getWinds();
+        Whirlpool[][] whirls = blockadeMap.getWhirls();
 
         for (int i = 0; i < sea.length; i++) {
             for(int j = 0; j < sea[i].length; j++) {
@@ -576,6 +555,14 @@ public class SeaBattleScene implements GameScene {
 
                 if (winds[i][j] != null) {
                     region = winds[i][j].getRegion();
+
+                    x = (i * GameTile.TILE_WIDTH / 2) - (j * GameTile.TILE_WIDTH / 2) - region.getRegionWidth() / 2;
+                    y = (i * GameTile.TILE_HEIGHT / 2) + (j * GameTile.TILE_HEIGHT / 2) - region.getRegionHeight() / 2;
+
+                    batch.draw(region, x, y);
+                }
+                else if (whirls[i][j] != null) {
+                    region = whirls[i][j].getRegion();
 
                     x = (i * GameTile.TILE_WIDTH / 2) - (j * GameTile.TILE_WIDTH / 2) - region.getRegionWidth() / 2;
                     y = (i * GameTile.TILE_HEIGHT / 2) + (j * GameTile.TILE_HEIGHT / 2) - region.getRegionHeight() / 2;

@@ -49,6 +49,8 @@ public class BlockadeMap {
      */
     private Wind[][] winds = new Wind[MAP_WIDTH][MAP_HEIGHT];
 
+    private Whirlpool[][] whirls = new Whirlpool[MAP_WIDTH][MAP_HEIGHT];
+
     /**
      * The sea tile
      */
@@ -84,6 +86,11 @@ public class BlockadeMap {
                     case WIND_SOUTH:
                         winds[x][y] = new Wind(context, tile);
                         break;
+                    case WP_NE:
+                    case WP_NW:
+                    case WP_SE:
+                    case WP_SW:
+                        whirls[x][y] = new Whirlpool(context, tile);
                 }
             }
         }
@@ -126,5 +133,9 @@ public class BlockadeMap {
 
     public Wind[][] getWinds() {
         return winds;
+    }
+
+    public Whirlpool[][] getWhirls() {
+        return whirls;
     }
 }

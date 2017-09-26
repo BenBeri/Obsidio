@@ -2,7 +2,7 @@ package com.benberi.cadesim;
 
 public class Constants {
 
-    public static final String name = "Obsidio pre-alpha 4";
+    public static final String name = "Obsidio Alpha (Grumbles is the gunner of all ships in this version, so it loads pretty fast)";
 
     /**
      * The port the simulator is using
@@ -14,5 +14,5 @@ public class Constants {
      */
     public static boolean PACKET_DEBUG = false;
 
-    public static final int TURN_TIME = 18;
+    public static final int TURN_TIME = 15;
 }
