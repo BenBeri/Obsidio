@@ -314,8 +314,9 @@ public abstract class Vessel extends Entity {
             rotationIndex = 0;
         }
         else if (rotationIndex < 0) {
-            rotationIndex = 14;
+            rotationIndex = 15;
         }
+
 
         this.updateRotation();
     }

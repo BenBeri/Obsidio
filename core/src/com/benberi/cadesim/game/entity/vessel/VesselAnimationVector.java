@@ -33,6 +33,8 @@ public class VesselAnimationVector {
 
     private int animationTicks;
 
+    private int tickIndex;
+
     /**
      * The current animation location
      */
@@ -67,6 +69,14 @@ public class VesselAnimationVector {
 
     public void tickAnimationTicks(float amm) {
         animationTicks += amm;
+    }
+
+    public int getTickIndex() {
+        return this.tickIndex;
+    }
+
+    public void setTickIndex(int idx) {
+        this.tickIndex = idx;
     }
 
     /**

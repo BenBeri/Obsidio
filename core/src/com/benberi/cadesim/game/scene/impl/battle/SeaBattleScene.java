@@ -269,7 +269,8 @@ public class SeaBattleScene implements GameScene {
                     // float step = 1 - (ship.getEndPoint().dst(ship.getLinearVector()) / ship.getDistanceToEndPoint());
 
 
-                    float velocityTurns = (0.011f * Gdx.graphics.getDeltaTime()) * 100; //Gdx.graphics.getDeltaTime();
+                   // float velocityTurns = (0.011f * Gdx.graphics.getDeltaTime()) * 100; //Gdx.graphics.getDeltaTime();
+                    float velocityTurns = (1.0f * Gdx.graphics.getDeltaTime()); //Gdx.graphics.getDeltaTime();
                     float velocityForward = (0.015f * Gdx.graphics.getDeltaTime()) * 100; //Gdx.graphics.getDeltaTime();
 
                     if (!move.isOneDimensionMove()) {
@@ -316,11 +317,14 @@ public class SeaBattleScene implements GameScene {
                         vessel.setY(current.y);
                     }
 
-                    // tick rotation of the ship image
-                    if (vessel.getAnimation().getAnimationTicks() >= 14) {
+                    if (result >= 25 && result <= 50 && vessel.getAnimation().getTickIndex() == 0 ||
+                            result >= 50 && result <= 75 && vessel.getAnimation().getTickIndex() == 1 ||
+                            result >= 75 && result <= 100 && vessel.getAnimation().getTickIndex() == 2 ||
+                            result >= 99 && vessel.getAnimation().getTickIndex() == 3 ) {
                         vessel.tickRotation();
-                        vessel.getAnimation().resetAnimationTicks();
+                        vessel.getAnimation().setTickIndex(vessel.getAnimation().getTickIndex() + 1);
                     }
+
                 }
             }
         }

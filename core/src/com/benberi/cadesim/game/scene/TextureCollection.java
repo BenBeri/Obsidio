@@ -67,7 +67,9 @@ public class TextureCollection {
      */
     private void createVessels() {
         vessels.put("warfrigate", new Texture("core/assets/vessel/wf/spritesheet.png"));
+        vessels.put("warbrig", new Texture("core/assets/vessel/wb/spritesheet.png"));
         vessels.put("warfrigate_sinking", new Texture("core/assets/vessel/wf/sinking.png"));
+        vessels.put("warbrig_sinking", new Texture("core/assets/vessel/wf/sinking.png"));
     }
 
     /**
@@ -80,8 +82,11 @@ public class TextureCollection {
 
     private void createMisc() {
         misc.put("large_ball", new Texture("core/assets/projectile/cannonball_large.png"));
+        misc.put("medium_ball", new Texture("core/assets/projectile/cannonball.png"));
         misc.put("large_splash", new Texture("core/assets/effects/splash_big.png"));
+        misc.put("small_splash", new Texture("core/assets/effects/splash_sm.png"));
         misc.put("explode_big", new Texture("core/assets/effects/explode_big.png"));
+        misc.put("explode_medium", new Texture("core/assets/effects/explode_med.png"));
         misc.put("hit", new Texture("core/assets/effects/hit.png"));
     }
 }
