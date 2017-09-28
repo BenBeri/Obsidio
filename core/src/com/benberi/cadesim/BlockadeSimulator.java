@@ -1,6 +1,8 @@
 package com.benberi.cadesim;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.benberi.cadesim.game.scene.GameScene;
 
 public class BlockadeSimulator extends ApplicationAdapter {
@@ -16,8 +18,11 @@ public class BlockadeSimulator extends ApplicationAdapter {
 		context.create();
 	}
 
+
 	@Override
 	public void render () {
+		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 		context.getPacketHandler().tickQueue();
 
@@ -33,6 +38,7 @@ public class BlockadeSimulator extends ApplicationAdapter {
 			scene.update();
 			scene.render();
 		}
+
 	}
 	
 	@Override

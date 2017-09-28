@@ -138,6 +138,7 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
 
     private boolean isDragging;
     private Vector2 draggingPosition;
+    private boolean executionMoves;
 
     protected BattleControlComponent(GameContext context, ControlAreaScene owner, boolean big) {
         super(context, owner);
@@ -224,6 +225,10 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
 
     }
 
+    public void setExecutingMoves(boolean flag) {
+        this.executionMoves = flag;
+    }
+    
     public HandMove createMove() {
         if (isBigShip) {
             return new BigShipHandMove();
@@ -261,7 +266,9 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
 
     @Override
     public boolean handleClick(float x, float y, int button) {
-        System.out.println(x + " " + y);
+        if (executionMoves) {
+            return false;
+        }
         if (isPlacingMoves(x, y)) {
             if (y >= 538 && y <= 569) {
                 handleMovePlace(0, button);

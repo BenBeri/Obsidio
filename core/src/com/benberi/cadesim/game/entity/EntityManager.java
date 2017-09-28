@@ -5,10 +5,7 @@ import com.benberi.cadesim.game.entity.vessel.Vessel;
 import com.benberi.cadesim.game.entity.vessel.impl.WarFrigate;
 import com.benberi.cadesim.game.entity.vessel.move.MovePhase;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Containing all kind of entities in the game
@@ -41,12 +38,17 @@ public class EntityManager {
     }
 
     public Vessel getVesselByPosition(float x, float y) {
+        clearNulls();
         for (Vessel vessel : vessels) {
             if (Math.round(vessel.getX()) == x && Math.round(vessel.getY()) == y) {
                 return vessel;
             }
         }
         return null;
+    }
+
+    public void clearNulls() {
+        vessels.removeIf(Objects::isNull);
     }
 
     /**

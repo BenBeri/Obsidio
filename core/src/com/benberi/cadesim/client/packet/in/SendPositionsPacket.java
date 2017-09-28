@@ -22,12 +22,13 @@ public class SendPositionsPacket extends ClientPacketExecutor {
 
             Vessel vessel = getContext().getEntities().getVesselByName(name);
             if (vessel != null) {
-                if (vessel.getX() != x || vessel.getY() != y || vessel.getRotationIndex() != face) {
-                    vessel.setPosition(x, y);
-                    vessel.setRotationIndex(face);
-                }
+                vessel.setPosition(x, y);
+                vessel.setRotationIndex(face);
             }
         }
+
+        getContext().getControlScene().getBnavComponent().setExecutingMoves(false);
+        getContext().getControlScene().getBnavComponent().resetMoves();
     }
 
     @Override

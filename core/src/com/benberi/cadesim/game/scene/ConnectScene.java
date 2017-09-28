@@ -142,6 +142,7 @@ public class ConnectScene implements GameScene, InputProcessor {
 
         stage.addActor(name);
         stage.addActor(address);
+        stage.addActor(address);
     }
 
     @Override
@@ -411,4 +412,5 @@ public class ConnectScene implements GameScene, InputProcessor {
     public boolean hasPopup() {
         return popup;
     }
+
 }

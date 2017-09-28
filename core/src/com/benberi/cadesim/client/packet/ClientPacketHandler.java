@@ -68,10 +68,11 @@ public class ClientPacketHandler {
 
             if (packet.getOpcode() == opcode) {
                 p.execute(packet);
+                packet.getBuffer().release();
                 return;
             }
         }
-
+        packet.getBuffer().release();
         logger.info("Packet with unknown opcode: " + packet.getOpcode() + " got dropped.");
     }
 

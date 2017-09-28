@@ -2,6 +2,7 @@ package com.benberi.cadesim;
 
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.benberi.cadesim.client.ClientConnectionCallback;
 import com.benberi.cadesim.client.ClientConnectionTask;
 import com.benberi.cadesim.client.codec.util.Packet;
@@ -29,6 +30,8 @@ import java.util.concurrent.Executors;
 public class GameContext {
 
     private Channel serverChannel;
+
+    public boolean clear;
 
     /**
      * The main class of the game
@@ -286,6 +289,8 @@ public class GameContext {
     public void setReady(boolean ready) {
         this.isReady = ready;
         Gdx.input.setInputProcessor(input);
+        clear = true;
+
     }
 
     public void dispose() {

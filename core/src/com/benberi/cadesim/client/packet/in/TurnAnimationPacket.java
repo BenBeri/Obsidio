@@ -46,7 +46,7 @@ public class TurnAnimationPacket extends ClientPacketExecutor {
         }
 
         getContext().getBattleScene().setTurnExecute();
-        getContext().getControlScene().getBnavComponent().resetMoves();
+        getContext().getControlScene().getBnavComponent().setExecutingMoves(true);
     }
 
     @Override
