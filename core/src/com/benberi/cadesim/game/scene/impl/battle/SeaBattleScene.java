@@ -3,7 +3,6 @@ package com.benberi.cadesim.game.scene.impl.battle;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -27,10 +26,11 @@ import com.benberi.cadesim.game.scene.GameScene;
 import com.benberi.cadesim.game.scene.impl.battle.map.BlockadeMap;
 import com.benberi.cadesim.game.scene.impl.battle.map.GameObject;
 import com.benberi.cadesim.game.scene.impl.battle.map.tile.GameTile;
-import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.*;
+import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.Cell;
+import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.Whirlpool;
+import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.Wind;
 
 import java.util.Iterator;
-import java.util.List;
 
 public class SeaBattleScene implements GameScene {
 
@@ -93,6 +93,7 @@ public class SeaBattleScene implements GameScene {
 
     private int vesselsCountWithCurrentPhase = 0;
     private int vesselsCountNonSinking = 0;
+    private boolean turnFinished;
 
     public SeaBattleScene(GameContext context) {
         this.context = context;
@@ -153,6 +154,7 @@ public class SeaBattleScene implements GameScene {
 
                     if (currentSlot > 3) {
                         currentSlot = -1;
+                        turnFinished = true;
                     }
 
                     recountVessels();
@@ -375,6 +377,20 @@ public class SeaBattleScene implements GameScene {
             }
         }
 
+        if (turnFinished) {
+            boolean found = false;
+            for (Vessel v : context.getEntities().listVesselEntities()) {
+                if (!v.isSinkingAnimationFinished()) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                context.notifyFinishTurn();
+                turnFinished = false;
+            }
+        }
         information.update();
     }
 
@@ -593,8 +609,6 @@ public class SeaBattleScene implements GameScene {
                 }
             }
         }
-
-        System.out.println(count);
     }
 
     private boolean canDraw(float x, float y, int width, int height) {

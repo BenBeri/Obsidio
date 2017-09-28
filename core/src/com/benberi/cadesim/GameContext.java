@@ -2,7 +2,6 @@ package com.benberi.cadesim;
 
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.benberi.cadesim.client.ClientConnectionCallback;
 import com.benberi.cadesim.client.ClientConnectionTask;
 import com.benberi.cadesim.client.codec.util.Packet;
@@ -326,6 +325,11 @@ public class GameContext {
     public void sendGenerationTarget(MoveType targetMove) {
         SetSealGenerationTargetPacket packet = new SetSealGenerationTargetPacket();
         packet.setTargetMove(targetMove.getId());
+        sendPacket(packet);
+    }
+
+    public void notifyFinishTurn() {
+        TurnFinishNotification packet = new TurnFinishNotification();
         sendPacket(packet);
     }
 }

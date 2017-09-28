@@ -24,6 +24,7 @@ public class SendPositionsPacket extends ClientPacketExecutor {
             if (vessel != null) {
                 vessel.setPosition(x, y);
                 vessel.setRotationIndex(face);
+                vessel.setSinking(false);
             }
         }
 

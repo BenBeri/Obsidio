@@ -3,7 +3,6 @@ package com.benberi.cadesim.game.entity.vessel;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.game.entity.Entity;
 import com.benberi.cadesim.game.entity.projectile.CannonBall;
@@ -92,6 +91,7 @@ public abstract class Vessel extends Entity {
     private List<CannonBall> cannonballs = new ArrayList<CannonBall>();
     private int moveDelay;
     private boolean bumpReached;
+    private boolean sinkingAnimationFinished = true;
 
     public Vessel(GameContext context, String name, int x, int y) {
         super(context);
@@ -131,6 +131,10 @@ public abstract class Vessel extends Entity {
 
     public boolean isSinkingTexture() {
         return isSinkingTexture;
+    }
+
+    public boolean isSinkingAnimationFinished() {
+        return sinkingAnimationFinished;
     }
 
     public VesselBumpVector getBumpVector() {
@@ -524,6 +528,10 @@ public abstract class Vessel extends Entity {
         if (!isSinking) {
             setDefaultTexture();
             isSinkingTexture = false;
+            sinkingAnimationFinished = true;
+        }
+        else {
+            sinkingAnimationFinished = false;
         }
     }
 
@@ -553,6 +561,7 @@ public abstract class Vessel extends Entity {
     public void tickSinkingTexture() {
         if (sinkingTicks == 5) {
             if (rotationIndex + 1 >= this.getOrientationPack().getAllOrientations().size()) {
+                sinkingAnimationFinished = true;
                 return;
             }
             setRotationIndex(rotationIndex + 1);
