@@ -427,7 +427,7 @@ public class SeaBattleScene implements GameScene {
                     // Y position of the vessel
                     float yy = getIsometricY(vessel.getX(), vessel.getY(), vessel);
 
-                    if (canDraw(xx + vessel.getOrientationLocation().getOffsetx(), yy + vessel.getOrientationLocation().getOffsety())) {
+                    if (canDraw(xx + vessel.getOrientationLocation().getOffsetx(), yy + vessel.getOrientationLocation().getOffsety(), vessel.getRegionWidth(), vessel.getRegionHeight())) {
                         // draw vessel
                         batch.draw(vessel, xx + vessel.getOrientationLocation().getOffsetx(), yy + vessel.getOrientationLocation().getOffsety());
                     }
@@ -441,7 +441,7 @@ public class SeaBattleScene implements GameScene {
                         int xx = (object.getX() * GameTile.TILE_WIDTH / 2) - (object.getY() * GameTile.TILE_WIDTH / 2) - region.getRegionWidth() / 2;
                         int yy = (object.getX() * GameTile.TILE_HEIGHT / 2) + (object.getY() * GameTile.TILE_HEIGHT / 2) - region.getRegionHeight() / 2;
 
-                        if (canDraw(xx + object.getOrientationLocation().getOffsetx(), yy + object.getOrientationLocation().getOffsety())) {
+                        if (canDraw(xx + object.getOrientationLocation().getOffsetx(), yy + object.getOrientationLocation().getOffsety(), region.getRegionWidth(), region.getRegionHeight())) {
                             batch.draw(region, xx + object.getOrientationLocation().getOffsetx(), yy + object.getOrientationLocation().getOffsety());
                         }
                     }
@@ -456,7 +456,7 @@ public class SeaBattleScene implements GameScene {
             for (CannonBall c : vessel.getCannonballs()) {
                 float cx = getIsometricX(c.getX(), c.getY(), c);
                 float cy = getIsometricY(c.getX(), c.getY(), c);
-                if (!canDraw(cx, cy)) {
+                if (!canDraw(cx, cy, c.getRegionWidth(), c.getRegionHeight())) {
                     continue;
                 }
 
@@ -474,7 +474,7 @@ public class SeaBattleScene implements GameScene {
                 TextureRegion r = vessel.getShootSmoke();
                 float cx = getIsometricX(vessel.getX(), vessel.getY(), r);
                 float cy = getIsometricY(vessel.getX(), vessel.getY(), r);
-                if (canDraw(cx, cy)) {
+                if (canDraw(cx, cy, r.getRegionWidth(), r.getRegionHeight())) {
                     batch.draw(r, cx, cy);
                 }
             }
@@ -578,7 +578,7 @@ public class SeaBattleScene implements GameScene {
                 int x = (i * GameTile.TILE_WIDTH / 2) - (j * GameTile.TILE_WIDTH / 2) - region.getRegionWidth() / 2;
                 int y = (i * GameTile.TILE_HEIGHT / 2) + (j * GameTile.TILE_HEIGHT / 2) - region.getRegionHeight() / 2;
 
-                if (canDraw(x, y)) {
+                if (canDraw(x, y, GameTile.TILE_WIDTH, GameTile.TILE_HEIGHT)) {
                     count++;
                     batch.draw(region, x, y);
                     if (winds[i][j] != null) {
@@ -597,9 +597,9 @@ public class SeaBattleScene implements GameScene {
         System.out.println(count);
     }
 
-    private boolean canDraw(float x, float y) {
-        return x + GameTile.TILE_WIDTH >= camera.position.x - camera.viewportWidth / 2 && x <= camera.position.x + camera.viewportWidth / 2 &&
-                y + GameTile.TILE_HEIGHT >= camera.position.y - camera.viewportHeight / 2 && y <= camera.position.y + camera.viewportHeight / 2;
+    private boolean canDraw(float x, float y, int width, int height) {
+        return x + width >= camera.position.x - camera.viewportWidth / 2 && x <= camera.position.x + camera.viewportWidth / 2 &&
+                y + height >= camera.position.y - camera.viewportHeight / 2 && y <= camera.position.y + camera.viewportHeight / 2;
     }
 
     public void setTurnExecute() {
