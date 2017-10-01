@@ -92,5 +92,6 @@ public class ClientPacketHandler {
         packets.put(12, new PlayerRespawnPacket(context));
         packets.put(13, new SendPositionsPacket(context));
         packets.put(14, new RemovePlayerShip(context));
+        packets.put(15, new SendMovesPacket(context));
     }
 }

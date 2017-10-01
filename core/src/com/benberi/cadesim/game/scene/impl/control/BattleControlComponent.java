@@ -267,7 +267,7 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
     @Override
     public boolean handleClick(float x, float y, int button) {
         if (executionMoves) {
-            return false;
+           // return false;
         }
         if (isPlacingMoves(x, y)) {
             if (y >= 538 && y <= 569) {
@@ -772,7 +772,6 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
             movesHolder[i].resetLeft();
             movesHolder[i].resetRight();
         }
-        cannons = 0;
     }
 
     public void setCannons(int side, int slot, int amount) {
@@ -790,5 +789,21 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
 
     public void setMoveSealTarget(MoveType moveSealTarget) {
         this.targetMove = moveSealTarget;
+    }
+
+    public void setMovePlaces(byte[] moves, byte[] left, byte[] right) {
+        for (int slot = 0; slot < 4; slot++) {
+            HandMove move = movesHolder[slot];
+            move.resetRight();
+            move.resetLeft();
+
+            move.setMove(MoveType.forId(moves[slot]));
+            for (int i = 0; i < left[slot]; i++) {
+                move.addLeft();
+            }
+            for (int i = 0; i < right[slot]; i++) {
+                move.addRight();
+            }
+        }
     }
 }

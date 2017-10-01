@@ -10,6 +10,8 @@ import com.benberi.cadesim.client.packet.OutgoingPacket;
 public class LoginPacket extends OutgoingPacket {
 
     private String name;
+    private int ship;
+    private int version;
 
     public LoginPacket() {
         super(0);
@@ -22,7 +24,17 @@ public class LoginPacket extends OutgoingPacket {
     @Override
     public void encode() {
         setPacketLengthType(PacketLength.BYTE);
+        writeByte(version);
+        writeByte(ship);
         writeByteString(name);
         setLength(getBuffer().readableBytes());
+    }
+
+    public void setShip(int ship) {
+        this.ship = ship;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 }

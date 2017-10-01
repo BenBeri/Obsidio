@@ -2,6 +2,7 @@ package com.benberi.cadesim.game.entity;
 
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.game.entity.vessel.Vessel;
+import com.benberi.cadesim.game.entity.vessel.VesselFactory;
 import com.benberi.cadesim.game.entity.vessel.impl.WarFrigate;
 import com.benberi.cadesim.game.entity.vessel.move.MovePhase;
 
@@ -26,11 +27,11 @@ public class EntityManager {
     /**
      * Adds an entity
      */
-    public void addEntity(String name, int x, int y, int face) {
-        WarFrigate wf = new WarFrigate(context, name, x, y);
-        wf.create();
-        wf.setRotationIndex(face);
-        vessels.add(wf);
+    public void addEntity(String name, int x, int y, int face, int ship) {
+        Vessel vessel = VesselFactory.create(context, name, x, y, ship);
+        vessel.create();
+        vessel.setRotationIndex(face);
+        vessels.add(vessel);
     }
 
     public Vessel getVessel(int index) {

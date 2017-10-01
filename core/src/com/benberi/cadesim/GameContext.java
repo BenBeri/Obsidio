@@ -11,8 +11,8 @@ import com.benberi.cadesim.client.packet.in.LoginResponsePacket;
 import com.benberi.cadesim.client.packet.out.*;
 import com.benberi.cadesim.game.entity.EntityManager;
 import com.benberi.cadesim.game.entity.vessel.move.MoveType;
-import com.benberi.cadesim.game.scene.ConnectScene;
-import com.benberi.cadesim.game.scene.ConnectionSceneState;
+import com.benberi.cadesim.game.scene.impl.connect.ConnectScene;
+import com.benberi.cadesim.game.scene.impl.connect.ConnectionSceneState;
 import com.benberi.cadesim.game.scene.GameScene;
 import com.benberi.cadesim.game.scene.TextureCollection;
 import com.benberi.cadesim.game.scene.impl.battle.SeaBattleScene;
@@ -213,9 +213,11 @@ public class GameContext {
      * Sends a login packet to the server with the given display name
      * @param display   The display name
      */
-    public void sendLoginPacket(String display) {
+    public void sendLoginPacket(String display, int ship) {
         LoginPacket packet = new LoginPacket();
+        packet.setVersion(Constants.VERSION);
         packet.setName(display);
+        packet.setShip(ship);
         sendPacket(packet);
     }
 
@@ -238,13 +240,13 @@ public class GameContext {
      * @param displayName   The display name
      * @param ip            The IP Address to connect
      */
-    public void connect(final String displayName, String ip) {
+    public void connect(final String displayName, String ip, int ship) {
         service.execute(new ClientConnectionTask(this, ip, new ClientConnectionCallback() {
             @Override
             public void onSuccess(Channel channel) {
                 serverChannel = channel; // initialize the server channel
                 connectScene.setState(ConnectionSceneState.CREATING_PROFILE);
-                sendLoginPacket(displayName); // send login packet
+                sendLoginPacket(displayName, ship); // send login packet
                 myVessel = displayName;
             }
 
@@ -266,9 +268,15 @@ public class GameContext {
             serverChannel.disconnect();
 
             switch (response) {
+                case LoginResponsePacket.BAD_VERSION:
+                    connectScene.setPopup("Outdated client");
+                    break;
                 case LoginResponsePacket.NAME_IN_USE:
                     connectScene.setPopup("Display name already in use");
                     break;
+                    case LoginResponsePacket.BAD_SHIP:
+                        connectScene.setPopup("The selected ship either does not exist, or not allowed");
+                        break;
                 case LoginResponsePacket.SERVER_FULL:
                     connectScene.setPopup("The server is full.");
                     break;

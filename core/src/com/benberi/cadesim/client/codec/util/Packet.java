@@ -70,6 +70,13 @@ public class Packet {
         return this.dataBuffer.readInt();
     }
 
+    public byte[] readBytes(int length) {
+        byte[] bytes = new byte[length];
+        this.dataBuffer.readBytes(bytes);
+
+        return bytes;
+    }
+
     public byte readByte() {
         return this.dataBuffer.readByte();
     }

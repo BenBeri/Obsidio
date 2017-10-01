@@ -1,4 +1,4 @@
-package com.benberi.cadesim.game.scene;
+package com.benberi.cadesim.game.scene.impl.connect;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -13,13 +13,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.benberi.cadesim.Constants;
 import com.benberi.cadesim.GameContext;
+import com.benberi.cadesim.game.scene.GameScene;
 import com.benberi.cadesim.util.RandomUtils;
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
 public class ConnectScene implements GameScene, InputProcessor {
 
@@ -70,6 +69,8 @@ public class ConnectScene implements GameScene, InputProcessor {
      */
     private Texture nameTexture;
 
+    private SelectBox<ShipTypeLabel> shipType;
+
     /**
      * The address textfield texture
      */
@@ -81,6 +82,10 @@ public class ConnectScene implements GameScene, InputProcessor {
     private Texture loginButton;
 
     private Texture loginButtonHover;
+
+    private Texture shipBox;
+    private Texture wf;
+    private Texture wb;
 
     /**
      * If a popup is open
@@ -140,9 +145,39 @@ public class ConnectScene implements GameScene, InputProcessor {
         address.setSize(225, 49);
         address.setPosition(370, 225);
 
+        SelectBox.SelectBoxStyle selectBoxStyle = new SelectBox.SelectBoxStyle();
+        selectBoxStyle.background = new Image(new Texture("core/assets/skin/selectbg.png")).getDrawable();
+        selectBoxStyle.font = font;
+        selectBoxStyle.fontColor = new Color(1,1,1, 1);
+        selectBoxStyle.listStyle = new List.ListStyle();
+        selectBoxStyle.listStyle.selection = new Image(new Texture("core/assets/skin/selectbg.png")).getDrawable();
+        selectBoxStyle.listStyle.selection.setLeftWidth(5);
+        selectBoxStyle.listStyle.font = font;
+        selectBoxStyle.listStyle.background = new Image(new Texture("core/assets/skin/select-list-bg.png")).getDrawable();
+        selectBoxStyle.scrollStyle = new ScrollPane.ScrollPaneStyle();
+        selectBoxStyle.background.setLeftWidth(10);
+        shipType = new SelectBox<>(selectBoxStyle);
+        shipType.setSize(150, 44);
+        shipType.setPosition(Gdx.graphics.getWidth() - 160, Gdx.graphics.getHeight() - 50);
+
+
+        shipBox = new Texture("core/assets/skin/ship-box.png");
+        wb = new Texture("core/assets/skin/ships/wb.png");
+        wf = new Texture("core/assets/skin/ships/wf.png");
+
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = font;
+        labelStyle.fontColor = new Color(0.16f, 0.16f, 0.16f, 1);
+        ShipTypeLabel[] blob = new ShipTypeLabel[2];
+        blob[0] = new ShipTypeLabel(ShipTypeLabel.WF,"War Frigate", labelStyle);
+        blob[1] = new ShipTypeLabel(ShipTypeLabel.WB,"War Brig",labelStyle);
+
+        shipType.setItems(blob);
+
         stage.addActor(name);
         stage.addActor(address);
         stage.addActor(address);
+        stage.addActor(shipType);
     }
 
     @Override
@@ -173,11 +208,19 @@ public class ConnectScene implements GameScene, InputProcessor {
 
             font.draw(batch, "Connect", 340, 196);
 
+            batch.draw(shipBox, Gdx.graphics.getWidth() - 230, Gdx.graphics.getHeight() - 50);
+            switch (shipType.getSelected().getType()) {
+                case ShipTypeLabel.WB:
+                    batch.draw(wb, Gdx.graphics.getWidth() - 223, Gdx.graphics.getHeight() - 50);
+                    break;
+                case ShipTypeLabel.WF:
+                    batch.draw(wf, Gdx.graphics.getWidth() - 223, Gdx.graphics.getHeight() - 50);
+                    break;
+            }
             batch.end();
 
             stage.act();
             stage.draw();
-
             if (popup) {
                 Gdx.gl.glEnable(GL20.GL_BLEND);
                 Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -360,7 +403,7 @@ public class ConnectScene implements GameScene, InputProcessor {
         }
         else {
             setState(ConnectionSceneState.CONNECTING);
-            context.connect(name.getText(), address.getText());
+            context.connect(name.getText(), address.getText(), shipType.getSelected().getType());
         }
     }
 

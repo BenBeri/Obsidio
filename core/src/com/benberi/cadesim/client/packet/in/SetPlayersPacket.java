@@ -20,7 +20,8 @@ public class SetPlayersPacket extends ClientPacketExecutor {
             int x = p.readByte();
             int y = p.readByte();
             int face = p.readByte();
-            getContext().getEntities().addEntity(name, x, y, face);
+            int ship = p.readByte();
+            getContext().getEntities().addEntity(name, x, y, face, ship);
         }
 
 

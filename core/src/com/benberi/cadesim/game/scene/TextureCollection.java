@@ -68,8 +68,8 @@ public class TextureCollection {
     private void createVessels() {
         vessels.put("warfrigate", new Texture("core/assets/vessel/wf/spritesheet.png"));
         vessels.put("warbrig", new Texture("core/assets/vessel/wb/spritesheet.png"));
-        vessels.put("warfrigate_sinking", new Texture("core/assets/vessel/wf/sinking.png"));
-        vessels.put("warbrig_sinking", new Texture("core/assets/vessel/wf/sinking.png"));
+        vessels.put("warfrigate_sinking", new Texture("core/assets/vessel/wf/sinking2.png"));
+        vessels.put("warbrig_sinking", new Texture("core/assets/vessel/wb/sinking.png"));
     }
 
     /**

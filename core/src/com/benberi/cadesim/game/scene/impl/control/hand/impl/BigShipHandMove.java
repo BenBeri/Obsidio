@@ -34,7 +34,6 @@ public class BigShipHandMove implements HandMove {
             right[1] = true;
         }
     }
-
     public void setMove(MoveType move) {
         this.move = move;
     }

@@ -1,4 +1,4 @@
-package com.benberi.cadesim.game.scene;
+package com.benberi.cadesim.game.scene.impl.connect;
 
 public enum ConnectionSceneState {
     DEFAULT,

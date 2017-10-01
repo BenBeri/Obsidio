@@ -2,7 +2,9 @@ package com.benberi.cadesim;
 
 public class Constants {
 
-    public static final String name = "Obsidio Alpha (Grumbles is the gunner of all ships in this version, so it loads pretty fast)";
+    public static final String name = "Obsidio Alpha v1.6";
+
+    public static final int VERSION = 1;
 
     /**
      * The port the simulator is using
