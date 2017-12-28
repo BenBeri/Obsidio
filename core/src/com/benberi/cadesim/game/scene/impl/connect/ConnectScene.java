@@ -70,6 +70,7 @@ public class ConnectScene implements GameScene, InputProcessor {
     private Texture nameTexture;
 
     private SelectBox<ShipTypeLabel> shipType;
+    private SelectBox<TeamTypeLabel> teamType;
 
     /**
      * The address textfield texture
@@ -156,10 +157,15 @@ public class ConnectScene implements GameScene, InputProcessor {
         selectBoxStyle.listStyle.background = new Image(new Texture("core/assets/skin/select-list-bg.png")).getDrawable();
         selectBoxStyle.scrollStyle = new ScrollPane.ScrollPaneStyle();
         selectBoxStyle.background.setLeftWidth(10);
+
+
         shipType = new SelectBox<>(selectBoxStyle);
         shipType.setSize(150, 44);
         shipType.setPosition(Gdx.graphics.getWidth() - 160, Gdx.graphics.getHeight() - 50);
 
+        teamType = new SelectBox<>(selectBoxStyle);
+        teamType.setSize(150, 44);
+        teamType.setPosition(Gdx.graphics.getWidth() - 160, Gdx.graphics.getHeight() - 100);
 
         shipBox = new Texture("core/assets/skin/ship-box.png");
         wb = new Texture("core/assets/skin/ships/wb.png");
@@ -168,16 +174,23 @@ public class ConnectScene implements GameScene, InputProcessor {
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         labelStyle.font = font;
         labelStyle.fontColor = new Color(0.16f, 0.16f, 0.16f, 1);
+
         ShipTypeLabel[] blob = new ShipTypeLabel[2];
         blob[0] = new ShipTypeLabel(ShipTypeLabel.WF,"War Frigate", labelStyle);
         blob[1] = new ShipTypeLabel(ShipTypeLabel.WB,"War Brig",labelStyle);
-
         shipType.setItems(blob);
+
+
+        TeamTypeLabel[] blob2 = new TeamTypeLabel[2];
+        blob2[0] = new TeamTypeLabel("Green", labelStyle);
+        blob2[1] = new TeamTypeLabel("Red" ,labelStyle);
+        teamType.setItems(blob2);
 
         stage.addActor(name);
         stage.addActor(address);
         stage.addActor(address);
         stage.addActor(shipType);
+        stage.addActor(teamType);
     }
 
     @Override
@@ -335,6 +348,11 @@ public class ConnectScene implements GameScene, InputProcessor {
     }
 
     @Override
+    public boolean handleMouseMove(float x, float y) {
+        return false;
+    }
+
+    @Override
     public boolean handleClickRelease(float x, float y, int button) {
         return false;
     }
@@ -403,7 +421,7 @@ public class ConnectScene implements GameScene, InputProcessor {
         }
         else {
             setState(ConnectionSceneState.CONNECTING);
-            context.connect(name.getText(), address.getText(), shipType.getSelected().getType());
+            context.connect(name.getText(), address.getText(), shipType.getSelected().getType(), teamType.getSelected().getType());
         }
     }
 

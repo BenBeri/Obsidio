@@ -66,8 +66,9 @@ public class PacketDecoder extends StatefulByteDecoder<PacketDecodeState> {
     private void decodeOpcode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) {
         if (buffer.isReadable()) {
             this.opcode = buffer.readByte();
-            if (Constants.PACKET_DEBUG)
-                System.out.println("opcode: " + opcode);
+            if (opcode == 3) {
+                System.out.println("received time! " + System.currentTimeMillis());
+            }
             setState(PacketDecodeState.LENGTH_TYPE);
         }
     }

@@ -15,4 +15,7 @@ public interface HandMove {
 
     MoveType getMove();
     void setMove(MoveType move);
+
+    void setMoveTemporary(boolean temp);
+    boolean isMoveTemp();
 }

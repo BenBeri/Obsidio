@@ -19,7 +19,8 @@ public class AddPlayerShip extends ClientPacketExecutor {
         int y = p.readByte();
         int face = p.readByte();
         int ship = p.readByte();
-        getContext().getEntities().addEntity(name, x, y, face, ship);
+        int team = p.readByte();
+        getContext().getEntities().addEntity(name, x, y, face, ship, team);
     }
 
     @Override

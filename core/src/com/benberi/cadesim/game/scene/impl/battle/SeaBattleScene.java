@@ -1,10 +1,9 @@
 package com.benberi.cadesim.game.scene.impl.battle;
 
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -13,12 +12,10 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Bezier;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.benberi.cadesim.GameContext;
 import com.benberi.cadesim.game.entity.projectile.CannonBall;
-import com.benberi.cadesim.game.entity.vessel.Vessel;
-import com.benberi.cadesim.game.entity.vessel.VesselBumpVector;
-import com.benberi.cadesim.game.entity.vessel.VesselMoveType;
-import com.benberi.cadesim.game.entity.vessel.VesselMovementAnimation;
+import com.benberi.cadesim.game.entity.vessel.*;
 import com.benberi.cadesim.game.entity.vessel.move.MoveAnimationTurn;
 import com.benberi.cadesim.game.entity.vessel.move.MovePhase;
 import com.benberi.cadesim.game.entity.vessel.move.MoveType;
@@ -94,6 +91,7 @@ public class SeaBattleScene implements GameScene {
     private int vesselsCountWithCurrentPhase = 0;
     private int vesselsCountNonSinking = 0;
     private boolean turnFinished;
+    private Vector3 mousePosititon;
 
     public SeaBattleScene(GameContext context) {
         this.context = context;
@@ -111,11 +109,16 @@ public class SeaBattleScene implements GameScene {
 
     @Override
     public void create() {
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("core/assets/font/FjallaOne-Regular.ttf"));
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("core/assets/font/Pixel-Miners.otf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 12;
-        parameter.shadowColor = new Color(0, 0, 0, 0.8f);
+        parameter.size =8;
+        parameter.spaceX = 0;
+        parameter.shadowColor = new Color(0, 0, 0, 0.5f);
+        parameter.borderColor = Color.BLACK;
+        parameter.borderWidth = 1;
+        parameter.borderStraight = true;
         parameter.shadowOffsetY = 1;
+        parameter.shadowOffsetX = 1;
         font = generator.generateFont(parameter);
 
         renderer = new ShapeRenderer();
@@ -435,6 +438,28 @@ public class SeaBattleScene implements GameScene {
 
         for (int x = BlockadeMap.MAP_WIDTH - 1; x > -1; x--) {
             for (int y = BlockadeMap.MAP_HEIGHT - 1; y > -1; y--) {
+                GameObject object = blockadeMap.getObject(x, y);
+                if (object != null) {
+                    TextureRegion region = object.getRegion();
+
+                    int xx = (object.getX() * GameTile.TILE_WIDTH / 2) - (object.getY() * GameTile.TILE_WIDTH / 2) - region.getRegionWidth() / 2;
+                    int yy = (object.getX() * GameTile.TILE_HEIGHT / 2) + (object.getY() * GameTile.TILE_HEIGHT / 2) - region.getRegionHeight() / 2;
+
+                    if (!object.isOriented() || canDraw(xx + object.getOrientationLocation().getOffsetx(), yy + object.getOrientationLocation().getOffsety(), region.getRegionWidth(), region.getRegionHeight())) {
+                        int offsetX = 0;
+                        int offsetY = 0;
+                        if (object.isOriented()) {
+                            offsetX = object.getOrientationLocation().getOffsetx();
+                            offsetY = object.getOrientationLocation().getOffsety();
+                        }
+                        else {
+                            offsetX = object.getCustomOffsetX();
+                            offsetY = object.getCustomOffsetY();
+                        }
+                        batch.draw(region, xx + offsetX, yy + offsetY);
+                    }
+                }
+
                 Vessel vessel = context.getEntities().getVesselByPosition(x, y);
                 if (vessel != null) {
                     // X position of the vessel
@@ -448,22 +473,49 @@ public class SeaBattleScene implements GameScene {
                         batch.draw(vessel, xx + vessel.getOrientationLocation().getOffsetx(), yy + vessel.getOrientationLocation().getOffsety());
                     }
 
-                }
-                else {
-                    GameObject object = blockadeMap.getObject(x, y);
-                    if (object != null) {
-                        TextureRegion region = object.getRegion();
 
-                        int xx = (object.getX() * GameTile.TILE_WIDTH / 2) - (object.getY() * GameTile.TILE_WIDTH / 2) - region.getRegionWidth() / 2;
-                        int yy = (object.getX() * GameTile.TILE_HEIGHT / 2) + (object.getY() * GameTile.TILE_HEIGHT / 2) - region.getRegionHeight() / 2;
+                    Vector3 v = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+                    camera.unproject(v, 0, 200, Gdx.graphics.getWidth(), Gdx.graphics.getHeight() - 200);
 
-                        if (canDraw(xx + object.getOrientationLocation().getOffsetx(), yy + object.getOrientationLocation().getOffsety(), region.getRegionWidth(), region.getRegionHeight())) {
-                            batch.draw(region, xx + object.getOrientationLocation().getOffsetx(), yy + object.getOrientationLocation().getOffsety());
+                    float xxx = xx + vessel.getOrientationLocation().getOffsetx();
+                    float yyy = yy + vessel.getOrientationLocation().getOffsety();
+
+                    if (v.x>= xxx && v.x <= xxx + vessel.getRegionWidth() && v.y >= yyy && v.y <= yyy + vessel.getRegionHeight()) {
+
+                        batch.end();
+                        // The vessel radius (diameter / 2)
+                        float radious = vessel.getInfluenceRadius();
+                        renderer.begin(ShapeRenderer.ShapeType.Line);
+                        //renderer.circle(vessel.getX(), vessel.getY(), radious * GameTile.TILE_HEIGHT);
+
+                        Gdx.gl.glEnable(GL20.GL_BLEND);
+                        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+                        Color color = (context.myVessel.equals(vessel.getName()) || context.myTeam.getID() == vessel.getTeam().getID()) ? Vessel.DEFAULT_BORDER_COLOR.cpy() : vessel.getTeam().getColor().cpy();
+                        color.a = 0.35f;
+
+                        renderer.setColor(color);
+                        for (int i = 0; i < 5; i++) {
+                            int width = (int) (radious * GameTile.TILE_WIDTH) + i;
+                            int height = (int) (radious * GameTile.TILE_HEIGHT) + i;
+                            renderer.ellipse(xx - width / 2 + vessel.getRegionWidth() / 2, yy - height / 2 + vessel.getRegionHeight() / 2, width, height);
                         }
+                        renderer.end();
+
+                        Gdx.gl.glDisable(GL20.GL_BLEND);
+                        batch.begin();
                     }
                 }
             }
         }
+
+//        public float getIsometricX(float x, float y, TextureRegion region) {
+//            return (x * GameTile.TILE_WIDTH / 2) - (y * GameTile.TILE_WIDTH / 2) - (region.getRegionWidth() / 2);
+//        }
+//
+//        public float getIsometricY(float x, float y, TextureRegion region) {
+//            return (x * GameTile.TILE_HEIGHT / 2) + (y * GameTile.TILE_HEIGHT / 2) - (region.getRegionHeight() / 2);
+//        }
 
         /*
          * Render cannon balls
@@ -522,7 +574,40 @@ public class SeaBattleScene implements GameScene {
 
             batch.begin();
             GlyphLayout layout = new GlyphLayout(font, vessel.getName());
+
+            if (vessel.getName().equalsIgnoreCase(context.myVessel) || vessel.getTeam().getID() == context.myTeam.getID()) {
+                font.setColor(Vessel.DEFAULT_BORDER_COLOR);
+            }
+            else {
+                font.setColor(vessel.getTeam().getColor());
+            }
+
             font.draw(batch, vessel.getName(), x + (vessel.getRegionWidth() / 2) - (layout.width / 2), y + vessel.getRegionHeight() * 1.7f);
+
+            float startX = x;
+            float flagsY = y + vessel.getRegionHeight() * 1.8f;
+
+            int points = 0;
+            for (FlagSymbol symbol : vessel.getFlags()) {
+                if (!symbol.isWar()) {
+                    points += symbol.getSize();
+                }
+                batch.draw(symbol, startX, flagsY);
+                startX += symbol.getRegionWidth() + 3;
+            }
+
+            if (vessel.hasScoreDisplay()) {
+                if (points > 0) {
+                    Color color = (context.myVessel.equals(vessel.getName()) || context.myTeam.getID() == vessel.getTeam().getID()) ? Vessel.DEFAULT_BORDER_COLOR.cpy() : vessel.getTeam().getColor().cpy();
+                    color.a = (float) vessel.getScoreDisplayMovement() / 100f;
+                    if (color.a < 0) {
+                        color.a = 0;
+                    }
+                    font.setColor(color);
+                    font.draw(batch, "+" + points + " points", x + vessel.getRegionWidth() + 20, y + vessel.getRegionHeight() * 1.7f - (100 - vessel.getScoreDisplayMovement()));
+                }
+                vessel.tickScoreMovement();
+            }
         }
     }
 
@@ -563,6 +648,12 @@ public class SeaBattleScene implements GameScene {
             return true;
         }
         this.canDragMap = false;
+        return false;
+    }
+
+    @Override
+    public boolean handleMouseMove(float x, float y) {
+        this.mousePosititon = new Vector3(x, y, 0);
         return false;
     }
 

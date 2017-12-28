@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.benberi.cadesim.GameContext;
+import com.benberi.cadesim.game.cade.Team;
 import com.benberi.cadesim.game.entity.projectile.CannonBall;
 import com.benberi.cadesim.game.entity.projectile.impl.LargeCannonball;
 import com.benberi.cadesim.game.entity.projectile.impl.MediumCannonball;
@@ -33,6 +34,11 @@ public class WarBrig extends Vessel {
     }
 
     @Override
+    public float getInfluenceRadius() {
+        return 4f;
+    }
+
+    @Override
     public CannonBall createCannon(GameContext ctx, Vessel source, Vector2 target) {
         return new MediumCannonball(ctx, source, target, getContext().getTextures().getMisc("small_splash"),
                 getContext().getTextures().getMisc("hit"));
@@ -45,7 +51,7 @@ public class WarBrig extends Vessel {
 
     @Override
     public void setDefaultTexture() {
-        this.setTexture(getContext().getTextures().getVessel("warbrig"));
+        this.setTexture(getVesselTexture("warbrig"));
         this.setOrientationPack(getContext().getTools().getGson().fromJson(
                 Gdx.files.internal("core/assets/vessel/wb/properties.json").readString(),
                 PackedObjectOrientation.class));
@@ -53,7 +59,7 @@ public class WarBrig extends Vessel {
 
     @Override
     public void setSinkingTexture() {
-        this.setTexture(getContext().getTextures().getVessel("warbrig_sinking"));
+        this.setTexture(getVesselTexture("warbrig_sinking"));
         this.setOrientationPack(getContext().getTools().getGson().fromJson(
                 Gdx.files.internal("core/assets/vessel/wb/sinking.json").readString(),
                 PackedObjectOrientation.class));

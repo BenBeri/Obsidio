@@ -10,6 +10,7 @@ public enum MoveType {
     NONE(0);
 
     private int id;
+    private boolean temp;
 
     MoveType(int id) {
         this.id = id;
@@ -17,6 +18,15 @@ public enum MoveType {
 
     public int getId() {
         return id;
+    }
+
+    public boolean isTemp() {
+        return this.temp;
+    }
+
+    public MoveType setTemp(boolean temp) {
+        this.temp = temp;
+        return this;
     }
 
     public int getIncrementXForRotation(int rotationIndex) {

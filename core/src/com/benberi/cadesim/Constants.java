@@ -2,9 +2,9 @@ package com.benberi.cadesim;
 
 public class Constants {
 
-    public static final String name = "Obsidio Alpha v1.6";
+    public static final String name = "Obsidio Alpha v1.8.8";
 
-    public static final int VERSION = 1;
+    public static final int VERSION = 6;
 
     /**
      * The port the simulator is using

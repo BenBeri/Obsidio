@@ -59,6 +59,11 @@ public class ControlAreaScene implements GameScene {
     }
 
     @Override
+    public boolean handleMouseMove(float x, float y) {
+        return false;
+    }
+
+    @Override
     public boolean handleClickRelease(float x, float y, int button) {
         if (control.handleRelease(x, y, button)) {
             return true;

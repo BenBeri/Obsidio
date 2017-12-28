@@ -26,7 +26,7 @@ public class GameInformation extends SceneComponent {
     private BitmapFont fontPoints;
     private BitmapFont timeFont;
 
-    private int teamOneScore = 102;
+    private int teamOneScore;
     private int teamTwoScore;
 
     private int time;
@@ -79,12 +79,12 @@ public class GameInformation extends SceneComponent {
         batch.begin();
         batch.draw(panel, 5, 5);
         fontTeam.setColor(new Color(146 / 255f, 236 / 255f, 30 / 255f, 1));
-        fontTeam.draw(batch, "Team One:", 18,120 );
+        fontTeam.draw(batch, "Defender:", 18,120 );
         fontPoints.draw(batch, Integer.toString(teamOneScore), 90,118 );
 
         fontTeam.setColor(new Color(162 / 255f, 7 / 255f, 7 / 255f, 1));
-        fontTeam.draw(batch, "Team Two:", 18,97 );
-        fontPoints.draw(batch, Integer.toString(teamOneScore), 90,95 );
+        fontTeam.draw(batch, "Attacker:", 18,97 );
+        fontPoints.draw(batch, Integer.toString(teamTwoScore), 90,95 );
 
         int minutes = time / 60;
         int seconds = time % 60;
@@ -116,5 +116,10 @@ public class GameInformation extends SceneComponent {
     @Override
     public boolean handleRelease(float x, float y, int button) {
         return false;
+    }
+
+    public void setPoints(int greenPoints, int redPoints) {
+        this.teamOneScore = greenPoints;
+        this.teamTwoScore = redPoints;
     }
 }

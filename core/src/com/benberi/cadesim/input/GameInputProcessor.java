@@ -65,6 +65,11 @@ public class GameInputProcessor implements InputProcessor {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
+        for (GameScene scene : context.getScenes()) {
+            if (scene.handleMouseMove(screenX, screenY)) {
+                break;
+            }
+        }
         return false;
     }
 

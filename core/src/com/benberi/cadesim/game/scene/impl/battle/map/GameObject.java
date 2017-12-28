@@ -15,8 +15,15 @@ public class GameObject extends GameTile {
      */
     private int y;
 
+    private int customOffsetX;
+    private int customOffsetY;
+
     public GameObject(GameContext context) {
         super(context);
+    }
+
+    public boolean isOriented() {
+        return true;
     }
 
     public int getX() {
@@ -33,6 +40,22 @@ public class GameObject extends GameTile {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    public int getCustomOffsetX() {
+        return customOffsetX;
+    }
+
+    public void setCustomOffsetX(int customOffsetX) {
+        this.customOffsetX = customOffsetX;
+    }
+
+    public int getCustomOffsetY() {
+        return customOffsetY;
+    }
+
+    public void setCustomOffsetY(int customOffsetY) {
+        this.customOffsetY = customOffsetY;
     }
 
     public void set(int x, int y) {

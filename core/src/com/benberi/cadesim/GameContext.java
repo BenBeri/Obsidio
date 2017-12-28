@@ -9,6 +9,7 @@ import com.benberi.cadesim.client.packet.ClientPacketHandler;
 import com.benberi.cadesim.client.packet.OutgoingPacket;
 import com.benberi.cadesim.client.packet.in.LoginResponsePacket;
 import com.benberi.cadesim.client.packet.out.*;
+import com.benberi.cadesim.game.cade.Team;
 import com.benberi.cadesim.game.entity.EntityManager;
 import com.benberi.cadesim.game.entity.vessel.move.MoveType;
 import com.benberi.cadesim.game.scene.impl.connect.ConnectScene;
@@ -92,6 +93,7 @@ public class GameContext {
     private ClientPacketHandler packets;
 
     private ConnectScene connectScene;
+    public Team myTeam;
 
     public GameContext(BlockadeSimulator main) {
         this.simulator = main;
@@ -213,11 +215,12 @@ public class GameContext {
      * Sends a login packet to the server with the given display name
      * @param display   The display name
      */
-    public void sendLoginPacket(String display, int ship) {
+    public void sendLoginPacket(String display, int ship, int team) {
         LoginPacket packet = new LoginPacket();
         packet.setVersion(Constants.VERSION);
         packet.setName(display);
         packet.setShip(ship);
+        packet.setTeam(team);
         sendPacket(packet);
     }
 
@@ -240,14 +243,15 @@ public class GameContext {
      * @param displayName   The display name
      * @param ip            The IP Address to connect
      */
-    public void connect(final String displayName, String ip, int ship) {
+    public void connect(final String displayName, String ip, int ship, int team) {
         service.execute(new ClientConnectionTask(this, ip, new ClientConnectionCallback() {
             @Override
             public void onSuccess(Channel channel) {
                 serverChannel = channel; // initialize the server channel
                 connectScene.setState(ConnectionSceneState.CREATING_PROFILE);
-                sendLoginPacket(displayName, ship); // send login packet
+                sendLoginPacket(displayName, ship, team); // send login packet
                 myVessel = displayName;
+                myTeam = Team.forId(team);
             }
 
             @Override

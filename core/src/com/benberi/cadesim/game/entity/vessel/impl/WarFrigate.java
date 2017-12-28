@@ -1,6 +1,10 @@
 package com.benberi.cadesim.game.entity.vessel.impl;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.benberi.cadesim.GameContext;
@@ -8,6 +12,7 @@ import com.benberi.cadesim.game.entity.projectile.CannonBall;
 import com.benberi.cadesim.game.entity.projectile.impl.LargeCannonball;
 import com.benberi.cadesim.game.entity.vessel.Vessel;
 import com.benberi.cadesim.game.entity.vessel.VesselMoveType;
+import com.benberi.cadesim.game.scene.TextureCollection;
 import com.benberi.cadesim.util.PackedObjectOrientation;
 
 public class WarFrigate extends Vessel {
@@ -32,6 +37,11 @@ public class WarFrigate extends Vessel {
     }
 
     @Override
+    public float getInfluenceRadius() {
+        return 5.5f;
+    }
+
+    @Override
     public CannonBall createCannon(GameContext ctx, Vessel source, Vector2 target) {
         return new LargeCannonball(ctx, source, target, getContext().getTextures().getMisc("large_splash"),
                 getContext().getTextures().getMisc("hit"));
@@ -44,7 +54,7 @@ public class WarFrigate extends Vessel {
 
     @Override
     public void setDefaultTexture() {
-        this.setTexture(getContext().getTextures().getVessel("warfrigate"));
+        this.setTexture(getVesselTexture("warfrigate"));
         this.setOrientationPack(getContext().getTools().getGson().fromJson(
                 Gdx.files.internal("core/assets/vessel/wf/properties.json").readString(),
                 PackedObjectOrientation.class));
@@ -52,7 +62,7 @@ public class WarFrigate extends Vessel {
 
     @Override
     public void setSinkingTexture() {
-        this.setTexture(getContext().getTextures().getVessel("warfrigate_sinking"));
+        this.setTexture(getVesselTexture("warfrigate_sinking"));
         this.setOrientationPack(getContext().getTools().getGson().fromJson(
                 Gdx.files.internal("core/assets/vessel/wf/sinking.json").readString(),
                 PackedObjectOrientation.class));

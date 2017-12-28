@@ -12,6 +12,7 @@ public class LoginPacket extends OutgoingPacket {
     private String name;
     private int ship;
     private int version;
+    private int team;
 
     public LoginPacket() {
         super(0);
@@ -26,6 +27,7 @@ public class LoginPacket extends OutgoingPacket {
         setPacketLengthType(PacketLength.BYTE);
         writeByte(version);
         writeByte(ship);
+        writeByte(team);
         writeByteString(name);
         setLength(getBuffer().readableBytes());
     }
@@ -36,5 +38,9 @@ public class LoginPacket extends OutgoingPacket {
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    public void setTeam(int team) {
+        this.team = team;
     }
 }

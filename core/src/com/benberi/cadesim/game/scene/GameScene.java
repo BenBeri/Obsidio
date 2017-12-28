@@ -40,6 +40,13 @@ public interface GameScene {
     boolean handleClick(float x, float y, int button);
 
     /**
+     * Handles move on screen
+     * @param x click-x
+     * @param y click-y
+     */
+    boolean handleMouseMove(float x, float y);
+
+    /**
      * Handles click release on screen
      * @param x click-x
      * @param y click-y

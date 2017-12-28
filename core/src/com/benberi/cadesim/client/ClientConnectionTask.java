@@ -21,7 +21,7 @@ public class ClientConnectionTask extends Bootstrap implements Runnable {
     /**
      * The worker
      */
-    private EventLoopGroup worker = new NioEventLoopGroup(1);
+    private EventLoopGroup worker = new NioEventLoopGroup(2);
 
     /**
      * The IP Address to connect

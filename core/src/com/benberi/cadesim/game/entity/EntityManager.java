@@ -1,6 +1,7 @@
 package com.benberi.cadesim.game.entity;
 
 import com.benberi.cadesim.GameContext;
+import com.benberi.cadesim.game.cade.Team;
 import com.benberi.cadesim.game.entity.vessel.Vessel;
 import com.benberi.cadesim.game.entity.vessel.VesselFactory;
 import com.benberi.cadesim.game.entity.vessel.impl.WarFrigate;
@@ -27,8 +28,9 @@ public class EntityManager {
     /**
      * Adds an entity
      */
-    public void addEntity(String name, int x, int y, int face, int ship) {
+    public void addEntity(String name, int x, int y, int face, int ship, int team) {
         Vessel vessel = VesselFactory.create(context, name, x, y, ship);
+        vessel.setTeam(Team.forId(team));
         vessel.create();
         vessel.setRotationIndex(face);
         vessels.add(vessel);
@@ -131,5 +133,19 @@ public class EntityManager {
 
     public void remove(Vessel vessel) {
         vessels.removeIf(vessel1 -> vessel1 == vessel);
+    }
+
+    public void clearFlagSymbols() {
+        for (Vessel v : vessels) {
+            v.clearFlags();
+        }
+    }
+
+    public void updatePlayerScoreAffects() {
+        for (Vessel vessel : listVesselEntities()) {
+            if (vessel.getFlags().size() > 0) {
+                vessel.setScoreDisplayMovement();
+            }
+        }
     }
 }

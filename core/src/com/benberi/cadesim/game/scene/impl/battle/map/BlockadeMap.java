@@ -42,7 +42,12 @@ public class BlockadeMap {
     /**
      * The rocks layer
      */
-    private BlockadeMapLayer rocks = new BlockadeMapLayer();
+    private BlockadeMapLayer<GameObject> rocks = new BlockadeMapLayer();
+
+    /**
+     * Flags layer
+     */
+    private BlockadeMapLayer<Flag> flags = new BlockadeMapLayer<>();
 
     /**
      * Action tiles such as winds, whirlpools
@@ -117,17 +122,17 @@ public class BlockadeMap {
         return sea;
     }
 
-    public BlockadeMapLayer getRocks() {
-        return rocks;
-    }
-
     public GameObject getObject(float x, float y) {
         for (GameObject object : rocks.getObjects()) {
             if (object.getX() == x && object.getY() == y) {
                 return object;
             }
         }
-
+        for (GameObject object : flags.getObjects()) {
+            if (object.getX() == x && object.getY() == y) {
+                return object;
+            }
+        }
         return null;
     }
 
@@ -137,5 +142,9 @@ public class BlockadeMap {
 
     public Whirlpool[][] getWhirls() {
         return whirls;
+    }
+
+    public BlockadeMapLayer<Flag> getFlags() {
+        return flags;
     }
 }

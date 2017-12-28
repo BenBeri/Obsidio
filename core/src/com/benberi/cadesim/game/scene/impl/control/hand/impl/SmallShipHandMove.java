@@ -9,6 +9,8 @@ public class SmallShipHandMove implements HandMove {
     private boolean[] right = new boolean[1];
     private MoveType move = MoveType.NONE;
 
+    private boolean moveTemp;
+
     public void resetLeft() {
         left = new boolean[1];
     }
@@ -31,6 +33,16 @@ public class SmallShipHandMove implements HandMove {
 
     public void setMove(MoveType move) {
         this.move = move;
+    }
+
+    @Override
+    public void setMoveTemporary(boolean temp) {
+        this.moveTemp = temp;
+    }
+
+    @Override
+    public boolean isMoveTemp() {
+        return moveTemp;
     }
 
     public MoveType getMove() {

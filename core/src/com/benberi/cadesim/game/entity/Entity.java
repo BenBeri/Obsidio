@@ -2,6 +2,7 @@ package com.benberi.cadesim.game.entity;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.benberi.cadesim.GameContext;
+import com.benberi.cadesim.game.cade.Team;
 import com.benberi.cadesim.util.OrientationLocation;
 import com.benberi.cadesim.util.PackedObjectOrientation;
 

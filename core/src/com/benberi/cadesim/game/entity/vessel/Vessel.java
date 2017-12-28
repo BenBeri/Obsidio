@@ -1,18 +1,26 @@
 package com.benberi.cadesim.game.entity.vessel;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.benberi.cadesim.GameContext;
+import com.benberi.cadesim.game.cade.Team;
 import com.benberi.cadesim.game.entity.Entity;
 import com.benberi.cadesim.game.entity.projectile.CannonBall;
 import com.benberi.cadesim.game.entity.vessel.move.MoveAnimationStructure;
 import com.benberi.cadesim.game.entity.vessel.move.MovePhase;
 import com.benberi.cadesim.game.entity.vessel.move.MoveType;
 import com.benberi.cadesim.game.entity.vessel.move.VesselMoveTurn;
+import com.benberi.cadesim.game.scene.TextureCollection;
 import com.benberi.cadesim.game.scene.impl.battle.map.GameObject;
 import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.BigRock;
+import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.Flag;
 import com.benberi.cadesim.util.OrientationLocation;
+import sun.awt.Symbol;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +29,8 @@ import java.util.List;
  * Represents a vessel abstraction
  */
 public abstract class Vessel extends Entity {
+
+    public static final Color DEFAULT_BORDER_COLOR = new Color(0.35294117647f, 0.67450980392f, 0.87058823529f, 1);
 
     /**
      * The name of this vessel player
@@ -63,6 +73,13 @@ public abstract class Vessel extends Entity {
     private VesselMoveTurn turn;
 
     /**
+     * The team
+     */
+    private Team team;
+
+    private int scoreDisplayMovement;
+
+    /**
      * The last finished phase
      */
     private MovePhase finishedPhase;
@@ -84,6 +101,7 @@ public abstract class Vessel extends Entity {
     private boolean isBumping;
     private VesselBumpVector bumpVector;
 
+    private List<FlagSymbol> flags = new ArrayList<>();
 
     /**
      * The cannon balls that were shoot
@@ -111,6 +129,18 @@ public abstract class Vessel extends Entity {
 
     public MovePhase getMovePhase() {
         return finishedPhase;
+    }
+
+    public void setScoreDisplayMovement() {
+        this.scoreDisplayMovement = 100;
+    }
+
+    public boolean hasScoreDisplay() {
+        return this.scoreDisplayMovement > -1;
+    }
+
+    public int getScoreDisplayMovement() {
+        return this.scoreDisplayMovement;
     }
 
     public MoveAnimationStructure getStructure() {
@@ -236,6 +266,16 @@ public abstract class Vessel extends Entity {
         return this.moveDelay;
     }
 
+    public void clearFlags() {
+        if (flags != null) {
+            flags.clear();
+        }
+    }
+
+    public List<FlagSymbol> getFlags() {
+        return this.flags;
+    }
+
     public void tickSmoke() {
         if (smokeTicks >= 5) {
             shootSmoke.setRegion(shootSmoke.getRegionX() + 40, 0, 40, 30);
@@ -332,6 +372,12 @@ public abstract class Vessel extends Entity {
     public void setRotationIndex(int index) {
         this.rotationIndex = index;
         this.updateRotation();
+    }
+
+
+    @Override
+    public void setPosition(float x, float y) {
+        super.setPosition(x, y);
     }
 
     /**
@@ -454,6 +500,8 @@ public abstract class Vessel extends Entity {
      */
     public abstract int getMaxCannons();
 
+    public abstract float getInfluenceRadius();
+
     public abstract CannonBall createCannon(GameContext ctx, Vessel source, Vector2 target);
 
     public abstract VesselMoveType getMoveType();
@@ -539,6 +587,7 @@ public abstract class Vessel extends Entity {
         this.moveDelay = 70;
     }
 
+
     public void tickNonSinkingTexture() {
         if (sinkingTicks == 6) {
             int next = rotationIndex - 1;
@@ -582,5 +631,25 @@ public abstract class Vessel extends Entity {
         bumpReached = false;
         isMoving = false;
         moveDelay = 40;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
+    public Team getTeam() {
+        return this.team;
+    }
+
+    protected Texture getVesselTexture(String v) {
+        Texture t = getContext().getTextures().getVessel(v);
+        if (getContext().myVessel.equals(this.name) || getContext().myTeam.getID() == getTeam().getID()) {
+            return t;
+        }
+        return TextureCollection.prepareTextureForTeam(t, getTeam());
+    }
+
+    public void tickScoreMovement() {
+        this.scoreDisplayMovement--;
     }
 }

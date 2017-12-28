@@ -93,5 +93,7 @@ public class ClientPacketHandler {
         packets.put(13, new SendPositionsPacket(context));
         packets.put(14, new RemovePlayerShip(context));
         packets.put(15, new SendMovesPacket(context));
+        packets.put(16, new SetFlagsPacket(context));
+        packets.put(17, new SetPlayerFlagsPacket(context));
     }
 }
