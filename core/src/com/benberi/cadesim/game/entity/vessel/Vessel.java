@@ -20,7 +20,6 @@ import com.benberi.cadesim.game.scene.impl.battle.map.GameObject;
 import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.BigRock;
 import com.benberi.cadesim.game.scene.impl.battle.map.tile.impl.Flag;
 import com.benberi.cadesim.util.OrientationLocation;
-import sun.awt.Symbol;
 
 import java.util.ArrayList;
 import java.util.List;
