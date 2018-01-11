@@ -6,8 +6,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public class ShipTypeLabel extends Label {
 
+	public static final int WB = 2;
     public static final int WF = 3;
-    public static final int WB = 2;
+	public static final int XEBEC = 4;
 
     private int type;
 

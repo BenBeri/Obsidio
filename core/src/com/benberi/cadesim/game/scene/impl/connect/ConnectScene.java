@@ -86,6 +86,7 @@ public class ConnectScene implements GameScene, InputProcessor {
 
     private Texture shipBox;
     private Texture wf;
+    private Texture xebec;
     private Texture wb;
 
     /**
@@ -169,15 +170,17 @@ public class ConnectScene implements GameScene, InputProcessor {
 
         shipBox = new Texture("core/assets/skin/ship-box.png");
         wb = new Texture("core/assets/skin/ships/wb.png");
+        xebec = new Texture("core/assets/skin/ships/xebec.png");
         wf = new Texture("core/assets/skin/ships/wf.png");
 
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         labelStyle.font = font;
         labelStyle.fontColor = new Color(0.16f, 0.16f, 0.16f, 1);
 
-        ShipTypeLabel[] blob = new ShipTypeLabel[2];
+        ShipTypeLabel[] blob = new ShipTypeLabel[3];
         blob[0] = new ShipTypeLabel(ShipTypeLabel.WF,"War Frigate", labelStyle);
-        blob[1] = new ShipTypeLabel(ShipTypeLabel.WB,"War Brig",labelStyle);
+        blob[1] = new ShipTypeLabel(ShipTypeLabel.XEBEC,"Xebec", labelStyle);
+        blob[2] = new ShipTypeLabel(ShipTypeLabel.WB,"War Brig",labelStyle);
         shipType.setItems(blob);
 
 
@@ -225,6 +228,9 @@ public class ConnectScene implements GameScene, InputProcessor {
             switch (shipType.getSelected().getType()) {
                 case ShipTypeLabel.WB:
                     batch.draw(wb, Gdx.graphics.getWidth() - 223, Gdx.graphics.getHeight() - 50);
+                    break;
+                case ShipTypeLabel.XEBEC:
+                    batch.draw(xebec, Gdx.graphics.getWidth() - 223, Gdx.graphics.getHeight() - 50);
                     break;
                 case ShipTypeLabel.WF:
                     batch.draw(wf, Gdx.graphics.getWidth() - 223, Gdx.graphics.getHeight() - 50);

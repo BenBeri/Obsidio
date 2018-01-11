@@ -1,0 +1,134 @@
+{
+  "name": "xebec",
+  "orientations": {
+    "0": {
+      "x": 0,
+      "y": 0,
+      "width": 46,
+      "height": 77,
+      "offsetx": 2,
+      "offsety": 16
+    },
+    "1": {
+      "x": 49,
+      "y": 0,
+      "width": 56,
+      "height": 77,
+      "offsetx": 2,
+      "offsety": 15
+    },
+    "2": {
+      "x": 111,
+      "y": 0,
+      "width": 70,
+      "height": 77,
+      "offsetx": 3,
+      "offsety": 17
+    },
+    "3": {
+      "x": 188,
+      "y": 0,
+      "width": 78,
+      "height": 77,
+      "offsetx": 7,
+      "offsety": 17
+    },
+    "4": {
+      "x": 274,
+      "y": 0,
+      "width": 82,
+      "height": 77,
+      "offsetx": 10,
+      "offsety": 20
+
+    },
+    "5": {
+      "x": 364,
+      "y": 0,
+      "width": 78,
+      "height": 77,
+      "offsetx": 8,
+      "offsety": 18
+    },
+    "6": {
+      "x": 447,
+      "y": 0,
+      "width": 61,
+      "height": 77,
+      "offsetx": 3,
+      "offsety": 17
+    },
+    "7": {
+      "x": 516,
+      "y": 0,
+      "width": 40,
+      "height": 77,
+      "offsetx": 3,
+      "offsety": 15
+    },
+    "8": {
+      "x": 571,
+      "y": 0,
+      "width": 36,
+      "height": 77,
+      "offsetx": 3,
+      "offsety": 12
+    },
+    "9": {
+      "x": 623,
+      "y": 0,
+      "width": 56,
+      "height": 77,
+      "offsetx": 0,
+      "offsety": 12
+    },
+    "10": {
+      "x": 687,
+      "y": 0,
+      "width": 70,
+      "height": 77,
+      "offsetx": -3,
+      "offsety": 16
+    },
+    "11": {
+      "x": 768,
+      "y": 0,
+      "width": 78,
+      "height": 77,
+      "offsetx": -5,
+      "offsety": 16
+    },
+    "12": {
+      "x": 855,
+      "y": 0,
+      "width": 81,
+      "height": 77,
+      "offsetx": -7,
+      "offsety": 18
+    },
+    "13": {
+      "x": 950,
+      "y": 0,
+      "width": 75,
+      "height": 77,
+      "offsetx": -8,
+      "offsety": 16
+    },
+    "14": {
+      "x": 1031,
+      "y": 0,
+      "width": 62,
+      "height": 77,
+      "offsetx": -3,
+      "offsety": 18
+    },
+    "15": {
+      "x": 1105,
+      "y": 0,
+      "width": 39,
+      "height": 77,
+      "offsetx": 3,
+      "offsety": 16
+    }
+  }
+}
