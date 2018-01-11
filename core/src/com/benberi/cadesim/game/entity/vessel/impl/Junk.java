@@ -12,9 +12,9 @@ import com.benberi.cadesim.game.entity.vessel.Vessel;
 import com.benberi.cadesim.game.entity.vessel.VesselMoveType;
 import com.benberi.cadesim.util.PackedObjectOrientation;
 
-public class Xebec extends Vessel {
+public class Junk extends Vessel {
 
-    public Xebec(GameContext context, String name, int x, int y) {
+    public Junk(GameContext context, String name, int x, int y) {
         super(context, name, x, y);
     }
 
@@ -35,7 +35,7 @@ public class Xebec extends Vessel {
 
     @Override
     public float getInfluenceRadius() {
-        return 4f;
+        return 2.5f;
     }
 
     @Override
@@ -51,17 +51,17 @@ public class Xebec extends Vessel {
 
     @Override
     public void setDefaultTexture() {
-        this.setTexture(getVesselTexture("xebec"));
+        this.setTexture(getVesselTexture("junk"));
         this.setOrientationPack(getContext().getTools().getGson().fromJson(
-                Gdx.files.internal("core/assets/vessel/xebec/properties.json").readString(),
+                Gdx.files.internal("core/assets/vessel/junk/properties.json").readString(),
                 PackedObjectOrientation.class));
     }
 
     @Override
     public void setSinkingTexture() {
-        this.setTexture(getVesselTexture("xebec_sinking"));
+        this.setTexture(getVesselTexture("junk_sinking"));
         this.setOrientationPack(getContext().getTools().getGson().fromJson(
-                Gdx.files.internal("core/assets/vessel/xebec/sinking.json").readString(),
+                Gdx.files.internal("core/assets/vessel/junk/sinking.json").readString(),
                 PackedObjectOrientation.class));
     }
 }
