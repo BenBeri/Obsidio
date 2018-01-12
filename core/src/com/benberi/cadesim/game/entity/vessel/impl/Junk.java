@@ -35,7 +35,7 @@ public class Junk extends Vessel {
 
     @Override
     public float getInfluenceRadius() {
-        return 2.5f;
+        return 3f;
     }
 
     @Override
