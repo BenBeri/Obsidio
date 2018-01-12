@@ -32,6 +32,8 @@ public class GameContext {
     private Channel serverChannel;
 
     public boolean clear;
+    
+    private int shipId = 0;
 
     /**
      * The main class of the game
@@ -111,17 +113,12 @@ public class GameContext {
         textures = new TextureCollection(this);
         textures.create();
 
-        this.input = new GameInputProcessor(this);
-        this.seaBattleScene = new SeaBattleScene(this);
-        seaBattleScene.create();
-        this.controlArea = new ControlAreaScene(this);
-        controlArea.create();
+        
 
         this.connectScene = new ConnectScene(this);
         connectScene.create();
         
-        scenes.add(controlArea);
-        scenes.add(seaBattleScene);
+        
 
     }
 
@@ -167,6 +164,17 @@ public class GameContext {
      */
     public ClientPacketHandler getPacketHandler() {
         return packets;
+    }
+    
+    public void createFurtherScenes(int shipId) {
+    	ControlAreaScene.shipId = shipId;
+    	this.input = new GameInputProcessor(this);
+        this.seaBattleScene = new SeaBattleScene(this);
+        seaBattleScene.create();
+        this.controlArea = new ControlAreaScene(this);
+        controlArea.create();
+        scenes.add(controlArea);
+        scenes.add(seaBattleScene);
     }
 
     public SeaBattleScene getBattleScene() {
@@ -222,6 +230,7 @@ public class GameContext {
         packet.setShip(ship);
         packet.setTeam(team);
         sendPacket(packet);
+        shipId = ship;
     }
 
     /**
@@ -292,6 +301,7 @@ public class GameContext {
             connectScene.setState(ConnectionSceneState.DEFAULT);
         }
         else {
+        	createFurtherScenes(shipId);
             connectScene.setState(ConnectionSceneState.CREATING_MAP);
         }
 
