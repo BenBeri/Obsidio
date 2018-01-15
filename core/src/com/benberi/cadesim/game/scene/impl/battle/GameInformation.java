@@ -122,4 +122,8 @@ public class GameInformation extends SceneComponent {
         this.teamOneScore = greenPoints;
         this.teamTwoScore = redPoints;
     }
+
+	public int getTime() {
+		return time;
+	}
 }

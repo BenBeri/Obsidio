@@ -73,9 +73,11 @@ public class TextureCollection {
         vessels.put("warfrigate", new Texture("core/assets/vessel/wf/spritesheet.png"));
         vessels.put("xebec", new Texture("core/assets/vessel/xebec/spritesheet.png"));
         vessels.put("warbrig", new Texture("core/assets/vessel/wb/spritesheet.png"));
+        vessels.put("junk", new Texture("core/assets/vessel/junk/spritesheet.png"));
         vessels.put("warfrigate_sinking", new Texture("core/assets/vessel/wf/sinking2.png"));
         vessels.put("xebec_sinking", new Texture("core/assets/vessel/xebec/sinking.png"));
         vessels.put("warbrig_sinking", new Texture("core/assets/vessel/wb/sinking.png"));
+        vessels.put("junk_sinking", new Texture("core/assets/vessel/junk/sinking.png"));
     }
 
     /**

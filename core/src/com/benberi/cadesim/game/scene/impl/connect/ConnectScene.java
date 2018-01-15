@@ -85,6 +85,7 @@ public class ConnectScene implements GameScene, InputProcessor {
     private Texture loginButtonHover;
 
     private Texture shipBox;
+    private Texture junk;
     private Texture wf;
     private Texture xebec;
     private Texture wb;
@@ -169,6 +170,7 @@ public class ConnectScene implements GameScene, InputProcessor {
         teamType.setPosition(Gdx.graphics.getWidth() - 160, Gdx.graphics.getHeight() - 100);
 
         shipBox = new Texture("core/assets/skin/ship-box.png");
+        junk = new Texture("core/assets/skin/ships/junk.png");
         wb = new Texture("core/assets/skin/ships/wb.png");
         xebec = new Texture("core/assets/skin/ships/xebec.png");
         wf = new Texture("core/assets/skin/ships/wf.png");
@@ -177,10 +179,12 @@ public class ConnectScene implements GameScene, InputProcessor {
         labelStyle.font = font;
         labelStyle.fontColor = new Color(0.16f, 0.16f, 0.16f, 1);
 
-        ShipTypeLabel[] blob = new ShipTypeLabel[3];
-        blob[0] = new ShipTypeLabel(ShipTypeLabel.WF,"War Frigate", labelStyle);
-        blob[1] = new ShipTypeLabel(ShipTypeLabel.XEBEC,"Xebec", labelStyle);
-        blob[2] = new ShipTypeLabel(ShipTypeLabel.WB,"War Brig",labelStyle);
+        ShipTypeLabel[] blob = new ShipTypeLabel[4];
+        blob[0] = new ShipTypeLabel(ShipTypeLabel.JUNK,"Junk", labelStyle);
+        blob[1] = new ShipTypeLabel(ShipTypeLabel.WB,"War Brig",labelStyle);
+        blob[2] = new ShipTypeLabel(ShipTypeLabel.XEBEC,"Xebec", labelStyle);
+        blob[3] = new ShipTypeLabel(ShipTypeLabel.WF,"War Frigate", labelStyle);
+        
         shipType.setItems(blob);
 
 
@@ -226,6 +230,9 @@ public class ConnectScene implements GameScene, InputProcessor {
 
             batch.draw(shipBox, Gdx.graphics.getWidth() - 230, Gdx.graphics.getHeight() - 50);
             switch (shipType.getSelected().getType()) {
+	            case ShipTypeLabel.JUNK:
+	                batch.draw(junk, Gdx.graphics.getWidth() - 223, Gdx.graphics.getHeight() - 50);
+	                break;
                 case ShipTypeLabel.WB:
                     batch.draw(wb, Gdx.graphics.getWidth() - 223, Gdx.graphics.getHeight() - 50);
                     break;
