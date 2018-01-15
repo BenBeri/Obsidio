@@ -9,6 +9,10 @@ import com.benberi.cadesim.game.scene.GameScene;
 public class ControlAreaScene implements GameScene {
 
     private GameContext context;
+    
+    public static int shipId = 0;
+    
+    private boolean bigShip = true;
 
     private BattleControlComponent control;
     private ShapeRenderer shapeRenderer;
@@ -20,8 +24,11 @@ public class ControlAreaScene implements GameScene {
     @Override
     public void create()
     {
+    	if(shipId == 5) {
+    		bigShip = false;
+    	}
         shapeRenderer = new ShapeRenderer();
-        this.control = new BattleControlComponent(context, this, true);
+        this.control = new BattleControlComponent(context, this, bigShip);
         control.create();
     }
 
