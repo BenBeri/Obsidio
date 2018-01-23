@@ -5,6 +5,8 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Random;
 
 public class RandomUtils {
@@ -23,6 +25,16 @@ public class RandomUtils {
     public static int randInt(int min, int max) {
         Random rand = new Random();
         return rand.nextInt((max - min) + 1) + min;
+    }
+    
+    public static boolean validUrl (String urlStr) {
+    	try {
+    		URL url = new URL(urlStr);
+    		return true;
+    		
+    	} catch (MalformedURLException e) {
+    		return false;
+    	}
     }
 
     public static boolean validIP (String ip) {
