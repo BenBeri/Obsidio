@@ -439,7 +439,7 @@ public class ConnectScene implements GameScene, InputProcessor {
         else if (address.getText().length() <= 0) {
             setPopup("Please enter an IP Address");
         }
-        else if (!RandomUtils.validIP(address.getText()) && RandomUtils.validUrl(address.getText())) {
+        else if (!RandomUtils.validIP(address.getText()) && !RandomUtils.validUrl(address.getText())) {
             setPopup("Please enter a valid IP Address or url");
         }
         else {

@@ -5,8 +5,10 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Random;
 
 public class RandomUtils {
@@ -29,12 +31,16 @@ public class RandomUtils {
     
     public static boolean validUrl (String urlStr) {
     	try {
-    		URL url = new URL(urlStr);
-    		return true;
-    		
-    	} catch (MalformedURLException e) {
-    		return false;
-    	}
+    		InetAddress address = InetAddress.getByName(urlStr); 
+    		if(validIP(address.getHostAddress())) {
+    			return true;
+    		}
+    		else {
+    			return false;
+    		}
+		} catch(UnknownHostException e) {
+			return false;
+		}
     }
 
     public static boolean validIP (String ip) {
