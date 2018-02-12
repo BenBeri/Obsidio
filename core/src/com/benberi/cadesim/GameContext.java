@@ -20,8 +20,12 @@ import com.benberi.cadesim.game.scene.impl.battle.SeaBattleScene;
 import com.benberi.cadesim.game.scene.impl.control.ControlAreaScene;
 import com.benberi.cadesim.input.GameInputProcessor;
 import com.benberi.cadesim.util.GameToolsContainer;
+import com.benberi.cadesim.util.RandomUtils;
+
 import io.netty.channel.Channel;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -251,8 +255,17 @@ public class GameContext {
      *
      * @param displayName   The display name
      * @param ip            The IP Address to connect
+     * @throws UnknownHostException 
      */
-    public void connect(final String displayName, String ip, int ship, int team) {
+    public void connect(final String displayName, String ip, int ship, int team) throws UnknownHostException {
+    	if(!RandomUtils.validIP(ip) && RandomUtils.validUrl(ip)) {
+    		try {
+	    		InetAddress address = InetAddress.getByName(ip); 
+	    		ip = address.getHostAddress();
+    		} catch(UnknownHostException e) {
+    			return;
+    		}
+    	}
         service.execute(new ClientConnectionTask(this, ip, new ClientConnectionCallback() {
             @Override
             public void onSuccess(Channel channel) {

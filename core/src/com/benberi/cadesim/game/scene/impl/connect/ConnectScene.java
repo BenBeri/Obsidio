@@ -1,5 +1,7 @@
 package com.benberi.cadesim.game.scene.impl.connect;
 
+import java.net.UnknownHostException;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
@@ -144,7 +146,7 @@ public class ConnectScene implements GameScene, InputProcessor {
         name.setSize(160, 49);
         name.setPosition(170, 225);
 
-        address = new TextField("", style);
+        address = new TextField("cadesim.dejong.cc", style);
         address.setSize(225, 49);
         address.setPosition(370, 225);
 
@@ -383,7 +385,11 @@ public class ConnectScene implements GameScene, InputProcessor {
                 } else if (stage.getKeyboardFocus() != address && address.getText().isEmpty()) {
                     stage.setKeyboardFocus(address);
                 } else {
-                    performLogin();
+                    try {
+						performLogin();
+					} catch (UnknownHostException e) {
+						return failed;
+					}
                 }
             }
             else {
@@ -414,12 +420,16 @@ public class ConnectScene implements GameScene, InputProcessor {
             closePopup();
         }
         else if (loginHover) {
-            performLogin();
+            try {
+				performLogin();
+			} catch (UnknownHostException e) {
+				return failed;
+			}
         }
         return false;
     }
 
-    private void performLogin() {
+    private void performLogin() throws UnknownHostException {
         if (name.getText().length() >= 20) {
             setPopup("Display name must be shorter.");
         }
@@ -429,8 +439,8 @@ public class ConnectScene implements GameScene, InputProcessor {
         else if (address.getText().length() <= 0) {
             setPopup("Please enter an IP Address");
         }
-        else if (!RandomUtils.validIP(address.getText())) {
-            setPopup("Please enter a valid IP Address");
+        else if (!RandomUtils.validIP(address.getText()) && !RandomUtils.validUrl(address.getText())) {
+            setPopup("Please enter a valid IP Address or url");
         }
         else {
             setState(ConnectionSceneState.CONNECTING);
