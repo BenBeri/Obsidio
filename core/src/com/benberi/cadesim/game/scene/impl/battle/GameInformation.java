@@ -30,6 +30,10 @@ public class GameInformation extends SceneComponent {
     private int teamTwoScore;
 
     private int time;
+    
+    private String defender = "Defender";
+    private String attacker = "Attacker";
+    private String longestTeam = attacker;
 
     GameInformation(GameContext context, GameScene owner) {
         super(context, owner);
@@ -75,23 +79,24 @@ public class GameInformation extends SceneComponent {
 
     @Override
     public void render() {
+    	int xPlacement = 40 + (longestTeam.length() * 6);
         Gdx.gl.glViewport(0,200, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.begin();
         batch.draw(panel, 5, 5);
         fontTeam.setColor(new Color(146 / 255f, 236 / 255f, 30 / 255f, 1));
-        fontTeam.draw(batch, "Defender:", 18,120 );
-        fontPoints.draw(batch, Integer.toString(teamOneScore), 90,118 );
+        fontTeam.draw(batch, this.defender + ":", 18,120 );
+        fontPoints.draw(batch, Integer.toString(teamOneScore), xPlacement,118 );
 
         fontTeam.setColor(new Color(162 / 255f, 7 / 255f, 7 / 255f, 1));
-        fontTeam.draw(batch, "Attacker:", 18,97 );
-        fontPoints.draw(batch, Integer.toString(teamTwoScore), 90,95 );
+        fontTeam.draw(batch, this.attacker + ":", 18,97 );
+        fontPoints.draw(batch, Integer.toString(teamTwoScore), xPlacement,95 );
 
         int minutes = time / 60;
         int seconds = time % 60;
 
         timeFont.setColor(new Color(1, 230 / 255f, 59 / 255f, 1));
 
-        timeFont.draw(batch, (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds), 32,50 );
+        timeFont.draw(batch, (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds), 62,50 );
 
         batch.end();
     }
@@ -125,5 +130,16 @@ public class GameInformation extends SceneComponent {
 
 	public int getTime() {
 		return time;
+	}
+	
+	public void setTeamNames(String attacker, String defender) {
+		this.attacker = attacker;
+		this.defender = defender;
+		if(defender.length() > attacker.length()) {
+			this.longestTeam = defender;
+		}
+		else {
+			this.longestTeam = attacker;
+		}
 	}
 }
