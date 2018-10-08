@@ -2,7 +2,7 @@ package com.benberi.cadesim;
 
 public class Constants {
 
-    public static final String name = "Obsidio Alpha v1.9.0";
+    public static final String name = "Obsidio Beta v1.9.3";
 
     public static final int VERSION = 7;
 

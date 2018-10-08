@@ -1,0 +1,134 @@
+{
+  "name": "wargalleon",
+  "orientations": {
+    "0": {
+      "x": 0,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx": 0,
+      "offsety": 15
+    },
+    "1": {
+      "x": 65,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx": 0,
+      "offsety": 15
+    },
+    "2": {
+      "x": 130,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx": 0,
+      "offsety": 15
+    },
+    "3": {
+      "x": 195,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx": 0,
+      "offsety": 15
+    },
+    "4": {
+      "x": 260,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx": 0,
+      "offsety": 15
+
+    },
+    "5": {
+      "x": 325,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx": 0,
+      "offsety": 15
+    },
+    "6": {
+      "x": 390,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx": 0,
+      "offsety": 15
+    },
+    "7": {
+      "x": 455,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx": 0,
+      "offsety": 15
+    },
+    "8": {
+      "x": 520,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx": 0,
+      "offsety": 15
+    },
+    "9": {
+      "x": 585,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx": 0,
+      "offsety": 15
+    },
+    "10": {
+      "x": 650,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx": 0,
+      "offsety": 15
+    },
+    "11": {
+      "x": 715,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx": 0,
+      "offsety": 15
+    },
+    "12": {
+      "x": 780,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx": 0,
+      "offsety": 15
+    },
+    "13": {
+      "x": 845,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx": 0,
+      "offsety": 15
+    },
+    "14": {
+      "x": 910,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx":0,
+      "offsety": 15
+    },
+    "15": {
+      "x": 975,
+      "y": 0,
+      "width": 65,
+      "height": 65,
+      "offsetx": 0,
+      "offsety": 15
+    }
+  }
+}

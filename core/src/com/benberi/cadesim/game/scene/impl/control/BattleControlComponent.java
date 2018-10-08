@@ -796,6 +796,7 @@ public class BattleControlComponent extends SceneComponent<ControlAreaScene> {
             movesHolder[i].resetLeft();
             movesHolder[i].resetRight();
         }
+        manuaverSlot = 3;
     }
 
     public void setCannons(int side, int slot, int amount) {

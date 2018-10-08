@@ -1,5 +1,9 @@
 package com.benberi.cadesim.game.scene.impl.connect;
 
+import java.io.*;
+import java.net.UnknownHostException;
+import java.util.Properties;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
@@ -88,6 +92,7 @@ public class ConnectScene implements GameScene, InputProcessor {
     private Texture junk;
     private Texture wf;
     private Texture xebec;
+    private Texture wg;
     private Texture wb;
 
     /**
@@ -113,6 +118,22 @@ public class ConnectScene implements GameScene, InputProcessor {
 
     @Override
     public void create() {
+
+        Properties prop = new Properties();
+        String fileName = "core/assets/user.config";
+        InputStream is = null;
+        try {
+            is = new FileInputStream(fileName);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            prop.load(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("core/assets/font/FjallaOne-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 18;
@@ -140,11 +161,11 @@ public class ConnectScene implements GameScene, InputProcessor {
         style.cursor = new Image(new Texture("core/assets/skin/textfield-cursor.png")).getDrawable();
         style.selection = new Image(new Texture("core/assets/skin/textfield-selection.png")).getDrawable();
 
-        name = new TextField("", style);
+        name = new TextField( prop.getProperty("user.username"), style);
         name.setSize(160, 49);
         name.setPosition(170, 225);
 
-        address = new TextField("", style);
+        address = new TextField( prop.getProperty("user.last_address"), style);
         address.setSize(225, 49);
         address.setPosition(370, 225);
 
@@ -173,17 +194,19 @@ public class ConnectScene implements GameScene, InputProcessor {
         junk = new Texture("core/assets/skin/ships/junk.png");
         wb = new Texture("core/assets/skin/ships/wb.png");
         xebec = new Texture("core/assets/skin/ships/xebec.png");
+        wg = new Texture("core/assets/skin/ships/wg.png");
         wf = new Texture("core/assets/skin/ships/wf.png");
 
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         labelStyle.font = font;
         labelStyle.fontColor = new Color(0.16f, 0.16f, 0.16f, 1);
 
-        ShipTypeLabel[] blob = new ShipTypeLabel[4];
+        ShipTypeLabel[] blob = new ShipTypeLabel[5];
         blob[0] = new ShipTypeLabel(ShipTypeLabel.JUNK,"Junk", labelStyle);
         blob[1] = new ShipTypeLabel(ShipTypeLabel.WB,"War Brig",labelStyle);
         blob[2] = new ShipTypeLabel(ShipTypeLabel.XEBEC,"Xebec", labelStyle);
-        blob[3] = new ShipTypeLabel(ShipTypeLabel.WF,"War Frigate", labelStyle);
+        blob[3] = new ShipTypeLabel(ShipTypeLabel.WG,"War Galleon", labelStyle);
+        blob[4] = new ShipTypeLabel(ShipTypeLabel.WF,"War Frigate", labelStyle);
         
         shipType.setItems(blob);
 
@@ -238,6 +261,9 @@ public class ConnectScene implements GameScene, InputProcessor {
                     break;
                 case ShipTypeLabel.XEBEC:
                     batch.draw(xebec, Gdx.graphics.getWidth() - 223, Gdx.graphics.getHeight() - 50);
+                    break;
+                case ShipTypeLabel.WG:
+                    batch.draw(wg, Gdx.graphics.getWidth() - 223, Gdx.graphics.getHeight() - 50);
                     break;
                 case ShipTypeLabel.WF:
                     batch.draw(wf, Gdx.graphics.getWidth() - 223, Gdx.graphics.getHeight() - 50);
@@ -383,7 +409,11 @@ public class ConnectScene implements GameScene, InputProcessor {
                 } else if (stage.getKeyboardFocus() != address && address.getText().isEmpty()) {
                     stage.setKeyboardFocus(address);
                 } else {
-                    performLogin();
+                    try {
+						performLogin();
+					} catch (UnknownHostException e) {
+						return failed;
+					}
                 }
             }
             else {
@@ -414,12 +444,16 @@ public class ConnectScene implements GameScene, InputProcessor {
             closePopup();
         }
         else if (loginHover) {
-            performLogin();
+            try {
+				performLogin();
+			} catch (UnknownHostException e) {
+				return failed;
+			}
         }
         return false;
     }
 
-    private void performLogin() {
+    private void performLogin() throws UnknownHostException {
         if (name.getText().length() >= 20) {
             setPopup("Display name must be shorter.");
         }
@@ -429,13 +463,28 @@ public class ConnectScene implements GameScene, InputProcessor {
         else if (address.getText().length() <= 0) {
             setPopup("Please enter an IP Address");
         }
-        else if (!RandomUtils.validIP(address.getText())) {
-            setPopup("Please enter a valid IP Address");
+        else if (!RandomUtils.validIP(address.getText()) && !RandomUtils.validUrl(address.getText())) {
+            setPopup("Please enter a valid IP Address or url");
         }
         else {
+            // Save current choices for next time
+            try {
+                changeProperty("core/assets/user.config", "user.username", name.getText());
+                changeProperty("core/assets/user.config", "user.last_address", address.getText());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             setState(ConnectionSceneState.CONNECTING);
             context.connect(name.getText(), address.getText(), shipType.getSelected().getType(), teamType.getSelected().getType());
         }
+    }
+
+    public static void changeProperty(String filename, String key, String value) throws IOException {
+        Properties prop =new Properties();
+        prop.load(new FileInputStream(filename));
+        prop.setProperty(key, value);
+        prop.store(new FileOutputStream(filename),null);
     }
 
     @Override
