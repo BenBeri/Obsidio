@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.Map;
 import com.badlogic.gdx.math.Bezier;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -111,7 +112,7 @@ public class SeaBattleScene implements GameScene {
     public void create() {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("core/assets/font/Pixel-Miners.otf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size =8;
+        parameter.size = 8;
         parameter.spaceX = 0;
         parameter.shadowColor = new Color(0, 0, 0, 0.5f);
         parameter.borderColor = Color.BLACK;
@@ -427,7 +428,7 @@ public class SeaBattleScene implements GameScene {
      * Draws the sea background
      */
     private void drawSea() {
-        batch.draw(sea, -1000, -1000, 0, 0, 5000, 5000);
+        batch.draw(sea, -2000, -1000, 0, 0, 5000, 5000);
     }
 
     /**
@@ -718,5 +719,11 @@ public class SeaBattleScene implements GameScene {
 
     public BlockadeMap getMap() {
         return blockadeMap;
+    }
+
+    public void initializePlayerCamera(Vessel vessel) {
+        float cameraX = getIsometricX(vessel.getX(), vessel.getY(), vessel);
+        float cameraY = getIsometricY(vessel.getX(), vessel.getY(), vessel);
+        camera.translate(cameraX, cameraY);
     }
 }
