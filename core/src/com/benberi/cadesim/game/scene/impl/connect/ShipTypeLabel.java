@@ -10,6 +10,7 @@ public class ShipTypeLabel extends Label {
     public static final int WF = 3;
 	public static final int XEBEC = 4;
 	public static final int JUNK = 5;
+    public static final int WG = 6;
 
     private int type;
 

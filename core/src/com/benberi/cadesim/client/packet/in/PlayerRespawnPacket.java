@@ -25,6 +25,9 @@ public class PlayerRespawnPacket extends ClientPacketExecutor {
             v.setRotationIndex(face);
             v.getStructure().reset();
             getContext().getControlScene().dispose();
+            if (v.getName().equals(getContext().myVessel)) {
+                getContext().getBattleScene().initializePlayerCamera(v);
+            }
         }
     }
 

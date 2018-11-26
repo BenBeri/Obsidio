@@ -333,6 +333,7 @@ public class GameContext {
         entities.dispose();
         isReady = false;
         connected = false;
+        scenes.clear();
         connectScene.setup();
         if (!connectScene.hasPopup())
             connectScene.setPopup("You have disconnected from the server.");
